@@ -1,0 +1,7 @@
+.*.env
+**/build/**
+**/deps/**
+venv*
+dist
+.manifest_cache
+datazen-out
