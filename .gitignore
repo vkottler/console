@@ -3,5 +3,5 @@
 **/deps/**
 venv*
 dist
-.manifest_cache
+.*_cache
 datazen-out

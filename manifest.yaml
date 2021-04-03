@@ -1,0 +1,24 @@
+default_target: "groups-all"
+
+configs:
+- "local/configs"
+
+variables:
+- "local/variables"
+
+templates:
+- "local/templates"
+
+compiles:
+- name: "html"
+
+renders:
+- name: "app.html"
+  key: "index.html"
+  dependencies:
+  - "html"
+
+groups:
+- name: "all"
+  dependencies:
+  - "renders-app.html"
