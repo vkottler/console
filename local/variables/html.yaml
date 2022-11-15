@@ -1,8 +1,9 @@
-title: "console"
-author: "Vaughn Kottler"
-description: "A web-front end for application control."
+---
+title: console
+author: Vaughn Kottler
+description: A web-front end for application control.
 keywords:
-- "Telemetry"
-- "Control"
-- "Console"
+  - Telemetry
+  - Control
+  - Console
 body: {}

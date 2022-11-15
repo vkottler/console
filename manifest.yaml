@@ -1,28 +1,42 @@
-default_target: "groups-all"
+---
+default_target: groups-all
+
+params:
+  project: console
 
 configs:
-- "config/configs"
+  - config/configs
 
 variables:
-- "local/variables"
-- "config/variables"
+  - local/variables
+  - config/variables
 
 templates:
-- "config/templates"
+  - local/templates
+  - config/templates
 
 schemas:
-- "config/schemas"
+  - config/schemas
 
 compiles:
-- name: "html"
+  - name: html
 
 renders:
-- name: "app.html"
-  key: "basic.html"
-  dependencies:
-  - "html"
+  - name: app.html
+    as: html_content
+    indent: 4
+    no_file: true
+    dependencies:
+      - html
+
+  - name: index.html
+    output_dir: "{{project}}"
+    key: basic.html
+    dependencies:
+      - html
+      - renders-app.html
 
 groups:
-- name: "all"
-  dependencies:
-  - "renders-app.html"
+  - name: all
+    dependencies:
+      - renders-index.html

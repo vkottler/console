@@ -5,3 +5,4 @@ venv*
 dist
 .*_cache
 datazen-out
+tags
