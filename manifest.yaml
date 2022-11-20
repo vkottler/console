@@ -5,6 +5,7 @@ params:
   project: console
 
 configs:
+  - local/configs
   - config/configs
 
 variables:

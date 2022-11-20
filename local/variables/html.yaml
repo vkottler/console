@@ -2,8 +2,14 @@
 title: console
 author: Vaughn Kottler
 description: A web-front end for application control.
+
+icon: favicon.ico
+
 keywords:
   - Telemetry
   - Control
   - Console
-body: {}
+
+style: ""
+body:
+  style: ""
