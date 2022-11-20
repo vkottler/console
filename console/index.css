@@ -6,3 +6,8 @@ body {
   height: 100%;
   margin: 0;
 }
+
+/* This is the application container. */
+body > :first-child {
+  height: 100%;
+}
