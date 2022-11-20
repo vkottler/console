@@ -25,6 +25,7 @@ host: env
 
 lint: env
 	npx eslint $($(PROJ)_DIR)/src
+	npx prettier --check $($(PROJ)_DIR)/src
 
 build: env
 	npx parcel build
