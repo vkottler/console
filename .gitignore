@@ -4,5 +4,8 @@
 venv*
 dist
 .*_cache
+.*-cache
 datazen-out
 tags
+node_modules
+src

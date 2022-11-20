@@ -8,9 +8,20 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: edit
+.PHONY: build edit env
 
-edit: $(PY_PREFIX)edit
+.DEFAULT_GOAL := host
 
-host: $(VENV_CONC)
-	@cd $($(PROJ)_DIR)/$(PROJ) && $(PYTHON) -m http.server 0
+# Link 'src' to the project directory.
+$($(PROJ)_DIR)/src:
+	cd $($(PROJ)_DIR) && ln -s $(PROJ) src
+
+env: $(VENV_CONC) $($(PROJ)_DIR)/src
+
+edit: env $(PY_PREFIX)edit
+
+host: env
+	npx parcel --no-cache
+
+build: env
+	npx parcel build

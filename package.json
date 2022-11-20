@@ -1,0 +1,10 @@
+{
+  "name": "console",
+  "source": "src/index.html",
+  "dependencies": {
+    "typescript": "^4.9.3"
+  },
+  "devDependencies": {
+    "parcel": "^2.8.0"
+  }
+}
