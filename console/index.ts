@@ -1,6 +1,7 @@
-export let app_elem = document.body.children.namedItem("app");
+export const app_elem = document.body.children.namedItem("app");
 
-let overlay_elem = document.body.children.namedItem("overlay");
+const overlay_elem = document.body.children.namedItem("overlay");
+console.log(overlay_elem);
 
 setInterval(() => {
   app_elem.innerHTML = new Date().getTime().toString();
