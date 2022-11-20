@@ -23,5 +23,8 @@ edit: env $(PY_PREFIX)edit
 host: env
 	npx parcel --no-cache
 
+lint: env
+	npx eslint $($(PROJ)_DIR)/src
+
 build: env
 	npx parcel build
