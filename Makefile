@@ -8,7 +8,7 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: build edit env
+.PHONY: build edit env server
 
 .DEFAULT_GOAL := host
 
@@ -29,3 +29,6 @@ lint: env
 
 build: env
 	npx parcel build
+
+server: env
+	$(PYTHON) $($(PROJ)_DIR)/server.py 0.0.0.0 0
