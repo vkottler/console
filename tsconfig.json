@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "isolatedModules": true,
+    "jsx": "react",
+    "jsxImportSource": "preact",
     "strict": true
   }
 }
