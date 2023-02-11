@@ -7,15 +7,11 @@ A sample WebSocket server script.
 # built-in
 import asyncio
 import sys
-from typing import List, cast
+from typing import List
 
 # third-party
-from runtimepy.net.websocket.connection import (
-    WebsocketConnection,
-    server_handler,
-)
-from vcorelib.asyncio import run_handle_interrupt
-import websockets
+from runtimepy.net.websocket.connection import WebsocketConnection
+from vcorelib.asyncio import run_handle_stop
 
 
 async def server_init(conn: WebsocketConnection) -> bool:
@@ -25,17 +21,17 @@ async def server_init(conn: WebsocketConnection) -> bool:
     return True
 
 
-async def _main(args: List[str]) -> int:
+async def _main(stop_sig: asyncio.Event, args: List[str]) -> int:
     """Event-loop application entry-point."""
 
-    async with websockets.server.serve(
-        server_handler(server_init), host=args[0], port=int(args[1])
+    async with WebsocketConnection.serve(
+        server_init, host=args[0], port=int(args[1])
     ) as server:
         for sock in server.sockets:
             host = sock.getsockname()
             print(f"Serving on: '{host[0]}:{host[1]}'.")
 
-        await asyncio.Future()
+        await stop_sig.wait()
 
     return 0
 
@@ -43,9 +39,8 @@ async def _main(args: List[str]) -> int:
 def main(args: List[str]) -> int:
     """Application entry-point."""
 
-    eloop = asyncio.new_event_loop()
-    asyncio.set_event_loop(eloop)
-    return cast(int, run_handle_interrupt(_main(args), eloop))
+    stop_sig = asyncio.Event()
+    return run_handle_stop(stop_sig, _main(stop_sig, args))
 
 
 if __name__ == "__main__":
