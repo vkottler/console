@@ -1,30 +1,42 @@
+import { AppOverlay } from "./overlay";
 import { test_elem } from "./test";
 import { render } from "preact";
 
 export class App {
   root: Element;
   app: HTMLElement;
+  overlay: AppOverlay;
   width: number;
   height: number;
 
   constructor(root: Element) {
     this.root = root;
-    this.app = document.createElement("div");
-    this.root.appendChild(this.app);
-
     this.width = 0;
     this.height = 0;
     this.poll_dimensions();
     this.register_events();
 
+    this.app = document.createElement("div");
+    this.root.appendChild(this.app);
+    this.app.style.height = "100%";
+    this.app.style.backgroundColor = "red";
+
+    this.overlay = new AppOverlay(this.app);
+
+    /* Time display. */
+    let new_elem = document.createElement("div");
+    new_elem.style.backgroundColor = "green";
+    this.app.appendChild(new_elem);
+
     /* Test that we can render the imported JSX element. */
-    const new_elem = document.createElement("div");
-    this.root.appendChild(new_elem);
+    new_elem = document.createElement("div");
+    new_elem.style.backgroundColor = "yellow";
+    this.app.appendChild(new_elem);
     render(test_elem, new_elem);
   }
 
   dispatch() {
-    this.app.innerHTML = `time: ${new Date().getTime().toString()}`;
+    this.app.children[1].innerHTML = `time: ${new Date().getTime().toString()}`;
   }
 
   register_events() {
