@@ -1,5 +1,6 @@
 import { AppOverlay } from "./overlay";
 import { test_elem } from "./test";
+import { Translation } from "./RectangleCorner";
 import { render } from "preact";
 
 export class App {
@@ -13,15 +14,16 @@ export class App {
     this.root = root;
     this.width = 0;
     this.height = 0;
-    this.poll_dimensions();
     this.register_events();
 
     this.app = document.createElement("div");
     this.root.appendChild(this.app);
+
     this.app.style.height = "100%";
     this.app.style.backgroundColor = "red";
 
     this.overlay = new AppOverlay(this.app);
+    this.poll_dimensions();
 
     /* Time display. */
     let new_elem = document.createElement("div");
@@ -55,16 +57,29 @@ export class App {
       this.height = this.root.clientHeight;
       console.log(`new width:  ${this.width}`);
       console.log(`new height: ${this.height}`);
+
+      this.overlay.poll_position();
     }
   }
 
   handle_keyup(event: KeyboardEvent) {
-    console.log("keyup");
     console.log(event);
   }
 
   handle_keydown(event: KeyboardEvent) {
-    console.log("keydown");
-    console.log(event);
+    switch (event.key) {
+      case "ArrowLeft":
+        this.overlay.translate(Translation.LEFT);
+        break;
+      case "ArrowRight":
+        this.overlay.translate(Translation.RIGHT);
+        break;
+      case "ArrowUp":
+        this.overlay.translate(Translation.UP);
+        break;
+      case "ArrowDown":
+        this.overlay.translate(Translation.DOWN);
+        break;
+    }
   }
 }

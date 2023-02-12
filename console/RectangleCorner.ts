@@ -1,36 +1,53 @@
 export enum RectangleCorner {
-  TOP_LEFT,
-  TOP_RIGHT,
-  BOTTOM_LEFT,
-  BOTTOM_RIGHT,
+  TOP_LEFT = 0,
+  TOP_RIGHT = 1,
+  BOTTOM_LEFT = 2,
+  BOTTOM_RIGHT = 3,
 }
 
 export function is_top(location: RectangleCorner): boolean {
-  return (
-    location === RectangleCorner.TOP_LEFT ||
-    location === RectangleCorner.TOP_RIGHT
-  );
+  return location < 2;
 }
 
 export function is_bottom(location: RectangleCorner): boolean {
-  return (
-    location === RectangleCorner.BOTTOM_LEFT ||
-    location === RectangleCorner.BOTTOM_RIGHT
-  );
+  return location >= 2;
 }
 
 export function is_left(location: RectangleCorner): boolean {
-  return (
-    location === RectangleCorner.TOP_LEFT ||
-    location === RectangleCorner.BOTTOM_LEFT
-  );
+  return location % 2 == 0;
 }
 
 export function is_right(location: RectangleCorner): boolean {
-  return (
-    location === RectangleCorner.TOP_RIGHT ||
-    location === RectangleCorner.BOTTOM_RIGHT
-  );
+  return location % 2 == 1;
+}
+
+export enum Translation {
+  UP,
+  DOWN,
+  LEFT,
+  RIGHT,
+}
+
+export function translate(
+  location: RectangleCorner,
+  translation: Translation
+): RectangleCorner {
+  switch (translation) {
+    case Translation.UP:
+      location &= 1;
+      break;
+    case Translation.DOWN:
+      location |= 2;
+      break;
+    case Translation.LEFT:
+      location &= 2;
+      break;
+    case Translation.RIGHT:
+      location |= 1;
+      break;
+  }
+
+  return location;
 }
 
 export class Offset {
