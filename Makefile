@@ -23,6 +23,9 @@ edit: env $(PY_PREFIX)edit
 host: env
 	npx parcel --no-cache
 
+format: env
+	npx prettier -w $($(PROJ)_DIR)/src
+
 lint: env
 	npx eslint $($(PROJ)_DIR)/src
 	npx prettier --check $($(PROJ)_DIR)/src
