@@ -39,7 +39,7 @@ export class GridNode {
           this.height -= size;
           new_node.width = this.width;
           /*
-           * set new node's location
+           * set new node's location (and/or check our own?)
            */
           valid = true;
         }
@@ -49,7 +49,7 @@ export class GridNode {
           this.height -= size;
           new_node.width = this.width;
           /*
-           * set new node's location
+           * set new node's location (and/or check our own?)
            */
           valid = true;
         }
@@ -59,7 +59,7 @@ export class GridNode {
           this.width -= size;
           new_node.height = this.height;
           /*
-           * set new node's location
+           * set new node's location (and/or check our own?)
            */
           valid = true;
         }
@@ -69,7 +69,7 @@ export class GridNode {
           this.width -= size;
           new_node.height = this.height;
           /*
-           * set new node's location
+           * set new node's location (and/or check our own?)
            */
           valid = true;
         }
