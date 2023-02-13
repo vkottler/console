@@ -1,4 +1,4 @@
-import { App } from "./app";
+import { App } from "./ts/App";
 
 /*
  * Application entry-point.

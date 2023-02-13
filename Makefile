@@ -30,6 +30,9 @@ lint: env
 	npx eslint $($(PROJ)_DIR)/src
 	npx prettier --check $($(PROJ)_DIR)/src
 
+test: env
+	npx jest --coverage
+
 build: env
 	npx parcel build
 

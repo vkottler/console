@@ -4,9 +4,8 @@ import {
   is_bottom,
   is_left,
   is_right,
-  translate,
-  Translation,
-} from "../src/RectangleCorner";
+} from "../src/ts/cartesian/RectangleCorner";
+import { translate, Translation } from "../src/ts/cartesian/Translation";
 
 describe("Testing the 'RectangleCorner' module.", () => {
   test("is_top", () => {

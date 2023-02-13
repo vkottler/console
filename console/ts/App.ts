@@ -1,6 +1,6 @@
-import { AppOverlay } from "./overlay";
+import { AppOverlay } from "./AppOverlay";
 import { test_elem } from "./test";
-import { Translation } from "./RectangleCorner";
+import { Translation } from "./cartesian/Translation";
 import { render } from "preact";
 
 export class App {
