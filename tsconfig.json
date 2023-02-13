@@ -4,6 +4,7 @@
     "jsx": "react",
     "jsxImportSource": "preact",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "target": "es6"
   }
 }

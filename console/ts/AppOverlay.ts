@@ -5,7 +5,8 @@ import { Dimensions } from "./cartesian/Dimensions";
 
 export class AppOverlay {
   root: HTMLElement;
-  elem: HTMLElement;
+  container: HTMLElement;
+  content: HTMLElement;
   location: RectangleCorner;
   offset: Offset;
   scale: number;
@@ -13,27 +14,40 @@ export class AppOverlay {
   constructor(
     root: HTMLElement,
     location: RectangleCorner = RectangleCorner.BOTTOM_RIGHT,
-    scale = 0.2
+    scale = 0.5
   ) {
     /*
      * Create the container element.
      */
     this.root = root;
-    this.elem = document.createElement("div");
-    this.root.appendChild(this.elem);
+    this.container = document.createElement("div");
+    this.root.appendChild(this.container);
+
+    /*
+     * Create the content element.
+     */
+    this.content = document.createElement("div");
+    this.container.appendChild(this.content);
 
     /*
      * Cosmetic style.
      */
-    this.elem.style.backgroundColor = "black";
-    this.elem.style.color = "white";
-    this.elem.style.opacity = "0.7";
+    this.container.style.backgroundColor = "black";
+    this.container.style.opacity = "0.8";
+
+    this.content.style.opacity = "1";
+    this.content.style.color = "white";
+    this.content.style.backgroundColor = "orange";
 
     /*
      * Structural style.
      */
-    this.elem.style.position = "absolute";
+    this.container.style.position = "absolute";
+    this.container.style.display = "grid";
     this.scale = scale;
+
+    this.content.style.textAlign = "center";
+    this.content.style.margin = "auto";
 
     /*
      * Positioning.
@@ -48,7 +62,7 @@ export class AppOverlay {
      * Update dimensions.
      */
     const dimensions = Dimensions.from_element(this.root, true, this.scale);
-    dimensions.apply(this.elem);
+    dimensions.apply(this.container);
 
     /*
      * Update location offset.
@@ -56,10 +70,12 @@ export class AppOverlay {
     if (location != undefined) {
       this.location = location;
     }
-    this.offset = Offset.corner(this.root, this.elem, this.location);
-    this.offset.apply(this.elem);
+    this.offset = Offset.corner(this.root, this.container, this.location);
+    this.offset.apply(this.container);
 
-    this.elem.innerHTML = `width: ${this.elem.clientWidth}, height: ${this.elem.clientHeight}`;
+    this.content.innerHTML =
+      `width: ${this.container.clientWidth}, ` +
+      `height: ${this.container.clientHeight}`;
   }
 
   translate(translation: Translation) {

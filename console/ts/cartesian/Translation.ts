@@ -7,6 +7,14 @@ export enum Translation {
   RIGHT,
 }
 
+export function is_vertical(direction: Translation) {
+  return direction == Translation.UP || direction == Translation.DOWN;
+}
+
+export function is_horizontal(direction: Translation) {
+  return direction == Translation.LEFT || direction == Translation.RIGHT;
+}
+
 export function translate(
   location: RectangleCorner,
   translation: Translation
