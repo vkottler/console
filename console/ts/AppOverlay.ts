@@ -2,6 +2,7 @@ import { RectangleCorner } from "./cartesian/RectangleCorner";
 import { Offset } from "./cartesian/Offset";
 import { Translation, translate } from "./cartesian/Translation";
 import { Dimensions } from "./cartesian/Dimensions";
+import { Grid } from "./cartesian/grid/Grid";
 
 export class AppOverlay {
   root: HTMLElement;
@@ -10,6 +11,7 @@ export class AppOverlay {
   location: RectangleCorner;
   offset: Offset;
   scale: number;
+  grid: Grid;
 
   constructor(
     root: HTMLElement,
@@ -29,6 +31,8 @@ export class AppOverlay {
     this.content = document.createElement("div");
     this.container.appendChild(this.content);
 
+    this.grid = new Grid(this.container, this.content);
+
     /*
      * Cosmetic style.
      */
@@ -43,7 +47,6 @@ export class AppOverlay {
      * Structural style.
      */
     this.container.style.position = "absolute";
-    this.container.style.display = "grid";
     this.scale = scale;
 
     this.content.style.textAlign = "center";
