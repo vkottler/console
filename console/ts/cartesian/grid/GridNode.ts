@@ -27,6 +27,9 @@ export class GridNode {
   }
 
   update_grid_coordinates() {
+    this.container.style.gridArea = `${this.location.row} / ${this.location.column} / span ${this.height} / span ${this.width}`;
+
+    /*
     this.container.style.gridRowStart = this.location.row.toString();
     this.container.style.gridColumnStart = this.location.column.toString();
     this.container.style.gridRowEnd = (
@@ -35,6 +38,7 @@ export class GridNode {
     this.container.style.gridColumnEnd = (
       this.location.column + this.width
     ).toString();
+    */
 
     /*
      * Debugging.

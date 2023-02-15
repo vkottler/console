@@ -5,6 +5,7 @@
     "jsxImportSource": "preact",
     "strict": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "target": "es6"
   }
 }
