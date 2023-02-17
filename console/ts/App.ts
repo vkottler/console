@@ -1,11 +1,7 @@
 import { AppOverlay } from "./AppOverlay";
-import { test_elem } from "./test";
 import { Translation } from "./cartesian/Translation";
-import { render } from "preact";
-import { GridElementManager } from "./grid/GridElementManager";
-import { GridArea } from "./grid/GridArea";
 
-export class App {
+export abstract class App {
   root: Element;
   app: HTMLElement;
   overlay: AppOverlay;
@@ -16,53 +12,19 @@ export class App {
     this.root = root;
     this.width = 0;
     this.height = 0;
-    this.register_events();
 
     this.app = document.createElement("div");
     this.root.appendChild(this.app);
-
     this.app.style.height = "100%";
-    this.app.style.backgroundColor = "red";
 
     this.overlay = new AppOverlay(this.app);
+
+    this.register_events();
+    this.init();
     this.poll_dimensions();
-
-    /* Time display. */
-    let new_elem = document.createElement("div");
-    new_elem.style.backgroundColor = "green";
-    this.app.appendChild(new_elem);
-
-    /* Test that we can render the imported JSX element. */
-    new_elem = document.createElement("div");
-    new_elem.style.backgroundColor = "yellow";
-    this.app.appendChild(new_elem);
-    render(test_elem, new_elem);
-
-    /*
-     * Sample grid container.
-     */
-    const container = document.createElement("div");
-    this.app.appendChild(container);
-    container.style.backgroundColor = "blue";
-    container.style.width = "50%";
-
-    /*
-     * Sample grid element.
-     */
-    new_elem = document.createElement("div");
-    new_elem.innerHTML = "Hello, world! (1)";
-    new_elem.style.backgroundColor = "yellow";
-
-    const grid = new GridElementManager(container, "test1", new_elem);
-
-    grid.expand(Translation.DOWN);
-    grid.expand(Translation.RIGHT);
-
-    new_elem = document.createElement("div");
-    new_elem.innerHTML = "Hello, world! (2)";
-    new_elem.style.backgroundColor = "green";
-    grid.createArea("test2", new_elem, new GridArea(1, 1));
   }
+
+  abstract init(): void | undefined;
 
   dispatch() {
     this.app.children[1].innerHTML = `time: ${new Date().getTime().toString()}`;

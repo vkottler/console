@@ -1,10 +1,10 @@
-import { App } from "./ts/App";
+import { SampleApp } from "./ts/apps/Grids";
 
 /*
  * Application entry-point.
  */
 export function init(root_elem: Element) {
-  const app = new App(root_elem);
+  const app = new SampleApp(root_elem);
   setInterval(app.dispatch.bind(app), 100);
 }
 
