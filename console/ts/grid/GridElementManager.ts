@@ -1,5 +1,17 @@
 import { GridArea, EMPTY } from "./GridArea";
-import { Translation } from "../cartesian/Translation";
+import {
+  Translation,
+  is_vertical,
+  is_horizontal,
+} from "../cartesian/Translation";
+
+function new_row(columns: number): string[] {
+  const new_row = [];
+  for (let col = 0; col < columns; col++) {
+    new_row.push(EMPTY);
+  }
+  return new_row;
+}
 
 export class GridElementManager {
   container: HTMLElement;
@@ -17,6 +29,13 @@ export class GridElementManager {
     this.container = container;
     this.container.style.display = "grid";
 
+    /*
+     * Need to fix this.
+     */
+    this.container.style.height = "50%";
+
+    this.container.style.gridAutoRows = "1fr";
+
     this.areas = new Map<string, GridArea>();
     this.elements = new Map<string, HTMLElement>();
 
@@ -27,43 +46,49 @@ export class GridElementManager {
   }
 
   validate(area: GridArea): boolean {
-    /*
-     * Validate location.
-     */
-    let result = 1 <= area.row && area.row < this.rows;
-    result &&= 1 < area.column && area.column < this.columns;
+    return area.validate(this.rows, this.columns, this.layout);
+  }
 
+  #update_container() {
     /*
-     * Validate size.
+     * Update the container's grid-template rows.
      */
-    result &&= area.row + area.height <= this.rows + 1;
-    result &&= area.column + area.width <= this.columns + 1;
-
-    if (!result) {
-      return false;
+    let line = [];
+    for (let row = 0; row < this.rows; row++) {
+      line.push("auto");
     }
+    //this.container.style.gridTemplateRows = line.join(" ");
 
     /*
-     * Validate that the layout isn't occupied anywhere this area would appear.
+     * Update the container's grid-template columns.
      */
-    for (let row = area.row - 1; row < area.row + area.height; row++) {
-      for (
-        let column = area.column - 1;
-        column < area.column + area.height;
-        column++
-      ) {
-        if (this.layout[row][column] != EMPTY) {
-          return false;
-        }
+    line = [];
+    for (let column = 0; column < this.columns; column++) {
+      line.push("auto");
+    }
+    //this.container.style.gridTemplateColumns = line.join(" ");
+
+    /*
+     * Update the container's grid-template areas;
+     */
+    let areas = "";
+    for (let row = 0; row < this.rows; row++) {
+      line = [];
+      for (let column = 0; column < this.columns; column++) {
+        line.push(this.layout[row][column]);
+      }
+      areas += '"' + line.join(" ") + '"';
+      if (row < this.rows - 1) {
+        areas += "\n";
       }
     }
-
-    return true;
+    this.container.style.gridTemplateAreas = areas;
   }
 
   createArea(name: string, element: HTMLElement, area?: GridArea): boolean {
     if (area == undefined) {
       area = new GridArea();
+      /* update this so it's in an unallocated location? */
     }
 
     if (name in this.areas || !this.validate(area)) {
@@ -80,37 +105,7 @@ export class GridElementManager {
      * Update the layout structure.
      */
     area.update_layout(name, this.layout);
-
-    /*
-     * Update the container's grid-template rows.
-     */
-    let line = [];
-    for (let row = 0; row < this.rows; row++) {
-      line.push("auto");
-    }
-    this.container.style.gridTemplateRows = line.join(" ");
-
-    /*
-     * Update the container's grid-template columns.
-     */
-    line = [];
-    for (let column = 0; column < this.columns; column++) {
-      line.push("auto");
-    }
-    this.container.style.gridTemplateColumns = line.join(" ");
-
-    /*
-     * Update the container's grid-template areas;
-     */
-    let areas = "";
-    for (let row = 0; row < this.rows; row++) {
-      line = [];
-      for (let column = 0; column < this.columns; column++) {
-        line.push(this.layout[row][column]);
-      }
-      areas += line.join(" ") + "\n";
-    }
-    this.container.style.gridTemplateAreas = areas;
+    this.#update_container();
 
     return true;
   }
@@ -122,6 +117,8 @@ export class GridElementManager {
 
     /* update the area and grid styling */
 
+    this.#update_container();
+
     return true;
   }
 
@@ -132,15 +129,46 @@ export class GridElementManager {
 
     /* remove area and update grid styling */
 
+    this.#update_container();
+
     return true;
   }
 
   expand(direction: Translation) {
-    console.log(direction);
+    switch (direction) {
+      case Translation.UP:
+        this.layout.unshift(new_row(this.columns));
+        break;
+      case Translation.DOWN:
+        this.layout.push(new_row(this.columns));
+        break;
+      case Translation.LEFT:
+        for (let row = 0; row < this.rows; row++) {
+          this.layout[row].unshift(EMPTY);
+        }
+        break;
+      case Translation.RIGHT:
+        for (let row = 0; row < this.rows; row++) {
+          this.layout[row].push(EMPTY);
+        }
+        break;
+    }
+
+    if (is_vertical(direction)) {
+      this.rows += 1;
+    }
+    if (is_horizontal(direction)) {
+      this.columns += 1;
+    }
+
+    this.#update_container();
   }
 
   contract(direction: Translation): boolean {
     console.log(direction);
+
+    this.#update_container();
+
     return true;
   }
 }

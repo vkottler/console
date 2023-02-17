@@ -33,6 +33,9 @@ lint: env
 test: env
 	npx jest --coverage
 
+test-%: env
+	npx jest -t $*
+
 build: env
 	npx parcel build
 
