@@ -3,7 +3,7 @@ import { test_elem } from "../test";
 import { Translation } from "../cartesian/Translation";
 import { render } from "preact";
 import { GridElementManager } from "../grid/GridElementManager";
-import { GridArea } from "../grid/GridArea";
+//import { GridArea } from "../grid/GridArea";
 import { AppOverlay } from "../AppOverlay";
 
 export class SampleApp extends App {
@@ -49,27 +49,16 @@ export class SampleApp extends App {
     grid.expand(Translation.DOWN);
     grid.expand(Translation.RIGHT);
 
+    /*
     new_elem = document.createElement("div");
     new_elem.innerHTML = "Hello, world! (2)";
     new_elem.style.backgroundColor = "green";
     grid.createArea("test2", new_elem, new GridArea(1, 1));
+    */
   }
 
-  handle_keydown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "ArrowLeft":
-        this.overlay.translate(Translation.LEFT);
-        break;
-      case "ArrowRight":
-        this.overlay.translate(Translation.RIGHT);
-        break;
-      case "ArrowUp":
-        this.overlay.translate(Translation.UP);
-        break;
-      case "ArrowDown":
-        this.overlay.translate(Translation.DOWN);
-        break;
-    }
+  direction_keydown(event: KeyboardEvent, direction: Translation) {
+    this.overlay.translate(direction);
   }
 
   dimensions_update(width: number, height: number) {

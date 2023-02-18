@@ -1,18 +1,87 @@
 import assert from "assert";
+import { Translation } from "../cartesian/Translation";
 
 export const EMPTY = ".";
 
-export class GridArea {
+export class GridLocation {
   row: number;
   column: number;
+
+  constructor(row = 0, column = 0) {
+    this.row = row;
+    this.column = column;
+  }
+}
+
+export class GridArea {
+  location: GridLocation;
   height: number;
   width: number;
 
-  constructor(row = 0, column = 0, height = 1, width = 1) {
-    this.row = row;
-    this.column = column;
+  constructor(location?: GridLocation, height = 1, width = 1) {
+    if (location == undefined) {
+      location = new GridLocation();
+    }
+    this.location = location;
     this.height = height;
     this.width = width;
+  }
+
+  translate(
+    direction: Translation,
+    rows: number,
+    columns: number
+  ): GridLocation | undefined {
+    const result = new GridLocation(this.row, this.column);
+
+    switch (direction) {
+      /*
+       * If we're on any row besides the first one, we can return the row
+       * directly above us.
+       */
+      case Translation.UP:
+        if (this.row > 0) {
+          result.row = this.row - 1;
+        }
+        return result;
+      /*
+       * Set the row to the row that appears below this area. Return the
+       * new area if it's within bounds.
+       */
+      case Translation.DOWN:
+        result.row = this.row + this.height;
+        if (result.row < rows) {
+          return result;
+        }
+        break;
+      /*
+       * If we're on any column besides the first one, we can return the column
+       * directly to our left.
+       */
+      case Translation.LEFT:
+        if (this.column > 0) {
+          result.column = this.column - 1;
+        }
+        return result;
+      /*
+       * Set the column to the column that appears to the right of this area.
+       * Return the new area if it's within bounds.
+       */
+      case Translation.RIGHT:
+        result.column = this.column + this.width;
+        if (result.column < columns) {
+          return result;
+        }
+        break;
+    }
+  }
+
+  get row() {
+    return this.location.row;
+  }
+
+  get column() {
+    return this.location.column;
   }
 
   apply(element: HTMLElement) {

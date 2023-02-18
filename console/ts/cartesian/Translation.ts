@@ -7,6 +7,19 @@ export enum Translation {
   RIGHT,
 }
 
+export function translation_name(translation: Translation) {
+  switch (translation) {
+    case Translation.UP:
+      return "up";
+    case Translation.DOWN:
+      return "down";
+    case Translation.LEFT:
+      return "left";
+    case Translation.RIGHT:
+      return "right";
+  }
+}
+
 export function is_vertical(direction: Translation) {
   return direction == Translation.UP || direction == Translation.DOWN;
 }

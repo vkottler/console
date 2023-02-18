@@ -1,9 +1,10 @@
-import { GridArea, EMPTY } from "./GridArea";
+import { EMPTY } from "./GridArea";
 import {
   Translation,
   is_vertical,
   is_horizontal,
 } from "../cartesian/Translation";
+import { GridElementManagerAreas } from "./areas";
 
 function new_row(columns: number): string[] {
   const new_row = [];
@@ -13,121 +14,7 @@ function new_row(columns: number): string[] {
   return new_row;
 }
 
-export class GridElementManager {
-  container: HTMLElement;
-  areas: Map<string, GridArea>;
-  elements: Map<string, HTMLElement>;
-  rows: number;
-  columns: number;
-  layout: string[][];
-
-  constructor(
-    container: HTMLElement,
-    initial_name: string,
-    initial_element: HTMLElement
-  ) {
-    this.container = container;
-    this.container.style.display = "grid";
-    this.container.style.gridAutoRows = "1fr";
-
-    this.areas = new Map<string, GridArea>();
-    this.elements = new Map<string, HTMLElement>();
-
-    this.rows = 1;
-    this.columns = 1;
-    this.layout = [[EMPTY]];
-    this.createArea(initial_name, initial_element);
-  }
-
-  validate(area: GridArea): boolean {
-    return area.validate(this.rows, this.columns, this.layout);
-  }
-
-  #update_container() {
-    /*
-     * Update the container's grid-template rows.
-     */
-    let line = [];
-    for (let row = 0; row < this.rows; row++) {
-      line.push("auto");
-    }
-    //this.container.style.gridTemplateRows = line.join(" ");
-
-    /*
-     * Update the container's grid-template columns.
-     */
-    line = [];
-    for (let column = 0; column < this.columns; column++) {
-      line.push("auto");
-    }
-    //this.container.style.gridTemplateColumns = line.join(" ");
-
-    /*
-     * Update the container's grid-template areas;
-     */
-    let areas = "";
-    for (let row = 0; row < this.rows; row++) {
-      line = [];
-      for (let column = 0; column < this.columns; column++) {
-        line.push(this.layout[row][column]);
-      }
-      areas += '"' + line.join(" ") + '"';
-      if (row < this.rows - 1) {
-        areas += "\n";
-      }
-    }
-    this.container.style.gridTemplateAreas = areas;
-  }
-
-  createArea(name: string, element: HTMLElement, area?: GridArea): boolean {
-    if (area == undefined) {
-      area = new GridArea();
-      /* update this so it's in an unallocated location? */
-    }
-
-    if (name in this.areas || !this.validate(area)) {
-      return false;
-    }
-
-    this.areas.set(name, area);
-    this.elements.set(name, element);
-
-    element.style.gridArea = name;
-    this.container.appendChild(element);
-
-    /*
-     * Update the layout structure.
-     */
-    area.update_layout(name, this.layout);
-    this.#update_container();
-
-    return true;
-  }
-
-  updateArea(name: string, area: GridArea): boolean {
-    if (!(name in this.areas) || !this.validate(area)) {
-      return false;
-    }
-
-    /* update the area and grid styling */
-
-    this.#update_container();
-
-    return true;
-  }
-
-  removeArea(name: string): boolean {
-    if (!(name in this.areas)) {
-      return false;
-    }
-
-    /* remove area and update grid styling */
-
-    this.#update_container();
-
-    return true;
-  }
-
+export class GridElementManager extends GridElementManagerAreas {
   expand(direction: Translation) {
     switch (direction) {
       case Translation.UP:
@@ -155,14 +42,86 @@ export class GridElementManager {
       this.columns += 1;
     }
 
-    this.#update_container();
+    this.update_container();
   }
 
-  contract(direction: Translation): boolean {
-    console.log(direction);
+  /**
+   * Determine if a row is empty.
+   */
+  is_row_empty(row: number, remove = false) {
+    for (let col = 0; col < this.columns; col++) {
+      if (this.layout[row][col] != EMPTY) {
+        return false;
+      }
+    }
 
-    this.#update_container();
+    if (remove) {
+      this.layout.splice(row, 1);
+      this.rows -= 1;
+    }
 
     return true;
+  }
+
+  /**
+   * Determine if a column is empty.
+   */
+  is_column_empty(column: number, remove = false) {
+    for (let row = 0; row < this.rows; row++) {
+      if (this.layout[row][column] != EMPTY) {
+        return false;
+      }
+    }
+
+    if (remove) {
+      for (let row = 0; row < this.rows; row++) {
+        this.layout[row].splice(column, 1);
+      }
+      this.columns -= 1;
+    }
+
+    return true;
+  }
+
+  /**
+   * Attempt to make the grid smaller. If the row or column that would be
+   * removed is either empty, or contains grid entities that can be made
+   * smaller, the grid will contract and the function returns true.
+   */
+  contract(direction: Translation): boolean {
+    let result = false;
+
+    switch (direction) {
+      /*
+       * Attempt to remove the bottom row.
+       */
+      case Translation.UP:
+        result = this.is_row_empty(this.rows - 1, true);
+        break;
+      /*
+       * Attempt to remove the top row.
+       */
+      case Translation.DOWN:
+        result = this.is_row_empty(0, true);
+        break;
+      /*
+       * Attempt to remove the furthest-right column.
+       */
+      case Translation.LEFT:
+        result = this.is_column_empty(this.columns - 1, true);
+        break;
+      /*
+       * Attempt to remove the furthest-left column.
+       */
+      case Translation.RIGHT:
+        result = this.is_column_empty(0, true);
+        break;
+    }
+
+    if (result) {
+      this.update_container();
+    }
+
+    return result;
   }
 }

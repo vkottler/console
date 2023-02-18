@@ -1,3 +1,22 @@
+import { Translation } from "./cartesian/Translation";
+
+function event_direction(event: KeyboardEvent): Translation | undefined {
+  switch (event.key) {
+    case "ArrowLeft":
+      return Translation.LEFT;
+      break;
+    case "ArrowRight":
+      return Translation.RIGHT;
+      break;
+    case "ArrowUp":
+      return Translation.UP;
+      break;
+    case "ArrowDown":
+      return Translation.DOWN;
+      break;
+  }
+}
+
 export abstract class App {
   app: HTMLElement;
   width: number;
@@ -47,7 +66,16 @@ export abstract class App {
     console.log(event);
   }
 
+  abstract direction_keydown(
+    event: KeyboardEvent,
+    direction: Translation
+  ): void | undefined;
+
   handle_keydown(event: KeyboardEvent) {
-    console.log(event);
+    const direction = event_direction(event);
+
+    if (direction != undefined) {
+      this.direction_keydown(event, direction);
+    }
   }
 }
