@@ -1,5 +1,6 @@
 import assert from "assert";
 import { Translation } from "../cartesian/Translation";
+import { GridDimensions } from "./GridDimensions";
 
 export const EMPTY = ".";
 
@@ -15,16 +16,22 @@ export class GridLocation {
 
 export class GridArea {
   location: GridLocation;
-  height: number;
-  width: number;
+  dimensions: GridDimensions;
 
   constructor(location?: GridLocation, height = 1, width = 1) {
     if (location == undefined) {
       location = new GridLocation();
     }
     this.location = location;
-    this.height = height;
-    this.width = width;
+    this.dimensions = new GridDimensions(height, width);
+  }
+
+  get height(): number {
+    return this.dimensions.height;
+  }
+
+  get width(): number {
+    return this.dimensions.width;
   }
 
   translate(

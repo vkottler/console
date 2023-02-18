@@ -16,6 +16,8 @@ function new_row(columns: number): string[] {
 
 export class GridElementManager extends GridElementManagerAreas {
   expand(direction: Translation) {
+    let size_changed = false;
+
     switch (direction) {
       case Translation.UP:
         this.layout.unshift(new_row(this.columns));
@@ -36,19 +38,28 @@ export class GridElementManager extends GridElementManagerAreas {
     }
 
     if (is_vertical(direction)) {
-      this.rows += 1;
+      this.dimensions.rows += 1;
+      size_changed = true;
     }
     if (is_horizontal(direction)) {
-      this.columns += 1;
+      this.dimensions.columns += 1;
+      size_changed = true;
     }
 
     this.update_container();
+
+    /*
+     * Trigger an event for the size change.
+     */
+    if (size_changed) {
+      this.fireGridResize();
+    }
   }
 
   /**
    * Determine if a row is empty.
    */
-  is_row_empty(row: number, remove = false) {
+  #isRowEmpty(row: number, remove = false) {
     for (let col = 0; col < this.columns; col++) {
       if (this.layout[row][col] != EMPTY) {
         return false;
@@ -57,7 +68,7 @@ export class GridElementManager extends GridElementManagerAreas {
 
     if (remove) {
       this.layout.splice(row, 1);
-      this.rows -= 1;
+      this.dimensions.rows -= 1;
     }
 
     return true;
@@ -66,7 +77,7 @@ export class GridElementManager extends GridElementManagerAreas {
   /**
    * Determine if a column is empty.
    */
-  is_column_empty(column: number, remove = false) {
+  #isColumnEmpty(column: number, remove = false) {
     for (let row = 0; row < this.rows; row++) {
       if (this.layout[row][column] != EMPTY) {
         return false;
@@ -77,7 +88,7 @@ export class GridElementManager extends GridElementManagerAreas {
       for (let row = 0; row < this.rows; row++) {
         this.layout[row].splice(column, 1);
       }
-      this.columns -= 1;
+      this.dimensions.columns -= 1;
     }
 
     return true;
@@ -96,30 +107,34 @@ export class GridElementManager extends GridElementManagerAreas {
        * Attempt to remove the bottom row.
        */
       case Translation.UP:
-        result = this.is_row_empty(this.rows - 1, true);
+        result = this.#isRowEmpty(this.rows - 1, true);
         break;
       /*
        * Attempt to remove the top row.
        */
       case Translation.DOWN:
-        result = this.is_row_empty(0, true);
+        result = this.#isRowEmpty(0, true);
         break;
       /*
        * Attempt to remove the furthest-right column.
        */
       case Translation.LEFT:
-        result = this.is_column_empty(this.columns - 1, true);
+        result = this.#isColumnEmpty(this.columns - 1, true);
         break;
       /*
        * Attempt to remove the furthest-left column.
        */
       case Translation.RIGHT:
-        result = this.is_column_empty(0, true);
+        result = this.#isColumnEmpty(0, true);
         break;
     }
 
     if (result) {
       this.update_container();
+      /*
+       * Trigger an event for the size change.
+       */
+      this.fireGridResize();
     }
 
     return result;

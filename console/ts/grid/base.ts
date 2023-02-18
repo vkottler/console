@@ -1,11 +1,13 @@
 import { GridArea, EMPTY } from "./GridArea";
+import { GridDimensions } from "./GridDimensions";
+
+export const GRID_RESIZE = "gridResize";
 
 export class GridElementManagerBase {
   container: HTMLElement;
   areas: Map<string, GridArea>;
   elements: Map<string, HTMLElement>;
-  rows: number;
-  columns: number;
+  dimensions: GridDimensions;
   layout: string[][];
   cursor: string;
 
@@ -16,20 +18,39 @@ export class GridElementManagerBase {
   ) {
     this.container = container;
     this.container.style.display = "grid";
+
+    /*
+     * Best effort to keep columns and rows the same size.
+     */
     this.container.style.gridAutoRows = "1fr";
+    this.container.style.gridAutoColumns = "1fr";
 
     this.areas = new Map<string, GridArea>();
     this.elements = new Map<string, HTMLElement>();
 
-    this.rows = 1;
-    this.columns = 1;
+    this.dimensions = new GridDimensions();
     this.layout = [[EMPTY]];
     this.cursor = "";
     this.createArea(initial_name, initial_element);
+    this.fireGridResize();
+  }
+
+  get rows(): number {
+    return this.dimensions.rows;
+  }
+
+  get columns(): number {
+    return this.dimensions.columns;
   }
 
   validate(area: GridArea): boolean {
     return area.validate(this.rows, this.columns, this.layout);
+  }
+
+  protected fireGridResize() {
+    this.container.dispatchEvent(
+      new CustomEvent<GridDimensions>(GRID_RESIZE, { detail: this.dimensions })
+    );
   }
 
   protected update_container() {
