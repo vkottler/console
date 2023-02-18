@@ -28,12 +28,6 @@ export class GridElementManager {
   ) {
     this.container = container;
     this.container.style.display = "grid";
-
-    /*
-     * Need to fix this.
-     */
-    this.container.style.height = "50%";
-
     this.container.style.gridAutoRows = "1fr";
 
     this.areas = new Map<string, GridArea>();
