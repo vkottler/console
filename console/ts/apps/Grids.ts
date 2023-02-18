@@ -1,8 +1,8 @@
 import { App } from "../App";
-import { GridElementManager } from "../grid/GridElementManager";
+import { Translation, translation_name } from "../cartesian/Translation";
 import { GRID_RESIZE } from "../grid/base";
 import { GridDimensions } from "../grid/GridDimensions";
-import { Translation, translation_name } from "../cartesian/Translation";
+import { GridElementManager } from "../grid/GridElementManager";
 
 export class SampleApp extends App {
   grid: GridElementManager;

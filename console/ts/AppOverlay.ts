@@ -1,8 +1,8 @@
-import { RectangleCorner } from "./cartesian/RectangleCorner";
-import { Offset } from "./cartesian/Offset";
-import { Translation, translate } from "./cartesian/Translation";
 import { Dimensions } from "./cartesian/Dimensions";
 import { Grid } from "./cartesian/grid/Grid";
+import { Offset } from "./cartesian/Offset";
+import { RectangleCorner } from "./cartesian/RectangleCorner";
+import { translate, Translation } from "./cartesian/Translation";
 
 export class AppOverlay {
   root: HTMLElement;

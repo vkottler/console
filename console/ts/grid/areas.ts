@@ -1,5 +1,5 @@
-import { GridArea } from "./GridArea";
 import { GridElementManagerBase } from "./base";
+import { GridArea } from "./GridArea";
 
 export class GridElementManagerAreas extends GridElementManagerBase {
   updateArea(name: string, area: GridArea): boolean {

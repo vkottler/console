@@ -1,4 +1,4 @@
-import { RectangleCorner, is_right, is_bottom } from "./RectangleCorner";
+import { is_bottom, is_right, RectangleCorner } from "./RectangleCorner";
 
 export class Offset {
   left: number;

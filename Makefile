@@ -24,6 +24,7 @@ host: env
 	npx parcel --no-cache
 
 format: env
+	npx eslint --fix $($(PROJ)_DIR)/src
 	npx prettier -w $($(PROJ)_DIR)/src
 
 lint: env

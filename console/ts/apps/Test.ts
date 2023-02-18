@@ -1,10 +1,11 @@
-import { App } from "../App";
-import { test_elem } from "../test";
-import { Translation } from "../cartesian/Translation";
 import { render } from "preact";
-import { GridElementManager } from "../grid/GridElementManager";
+
+import { App } from "../App";
 //import { GridArea } from "../grid/GridArea";
 import { AppOverlay } from "../AppOverlay";
+import { Translation } from "../cartesian/Translation";
+import { GridElementManager } from "../grid/GridElementManager";
+import { test_elem } from "../test";
 
 export class SampleApp extends App {
   overlay: AppOverlay;

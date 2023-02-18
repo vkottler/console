@@ -1,4 +1,4 @@
-import { GridArea, EMPTY } from "./GridArea";
+import { EMPTY, GridArea } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
 
 export const GRID_RESIZE = "gridResize";

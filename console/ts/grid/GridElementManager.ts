@@ -1,10 +1,10 @@
-import { EMPTY } from "./GridArea";
 import {
-  Translation,
-  is_vertical,
   is_horizontal,
+  is_vertical,
+  Translation,
 } from "../cartesian/Translation";
 import { GridElementManagerAreas } from "./areas";
+import { EMPTY } from "./GridArea";
 
 function new_row(columns: number): string[] {
   const new_row = [];

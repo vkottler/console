@@ -1,5 +1,5 @@
-import { GridLocation } from "./GridLocation";
 import { Translation } from "../Translation";
+import { GridLocation } from "./GridLocation";
 
 export class GridNode {
   container: HTMLElement;

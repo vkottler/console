@@ -1,4 +1,4 @@
-import { Translation, is_vertical, is_horizontal } from "./Translation";
+import { is_horizontal, is_vertical, Translation } from "./Translation";
 
 export class GridNode {
   above: Set<GridNode>;

@@ -1,4 +1,5 @@
 import assert from "assert";
+
 import { Translation } from "../cartesian/Translation";
 import { GridDimensions } from "./GridDimensions";
 
