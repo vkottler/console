@@ -4,4 +4,8 @@ export class SampleApp extends App {
   init() {
     console.log("New app.");
   }
+
+  dispatch() {
+    return;
+  }
 }

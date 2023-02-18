@@ -1,23 +1,15 @@
-import { AppOverlay } from "./AppOverlay";
-import { Translation } from "./cartesian/Translation";
-
 export abstract class App {
-  root: Element;
   app: HTMLElement;
-  overlay: AppOverlay;
   width: number;
   height: number;
 
   constructor(root: Element) {
-    this.root = root;
     this.width = 0;
     this.height = 0;
 
     this.app = document.createElement("div");
-    this.root.appendChild(this.app);
+    root.appendChild(this.app);
     this.app.style.height = "100%";
-
-    this.overlay = new AppOverlay(this.app);
 
     this.register_events();
     this.init();
@@ -26,9 +18,7 @@ export abstract class App {
 
   abstract init(): void | undefined;
 
-  dispatch() {
-    this.app.children[1].innerHTML = `time: ${new Date().getTime().toString()}`;
-  }
+  abstract dispatch(): void | undefined;
 
   register_events() {
     window.onresize = this.poll_dimensions.bind(this);
@@ -37,17 +27,19 @@ export abstract class App {
     document.addEventListener("keyup", this.handle_keyup.bind(this));
   }
 
+  dimensions_update(width: number, height: number) {
+    console.log(`new width:  ${width}`);
+    console.log(`new height: ${height}`);
+  }
+
   poll_dimensions() {
     if (
-      this.width != this.root.clientWidth ||
-      this.height != this.root.clientHeight
+      this.width != this.app.clientWidth ||
+      this.height != this.app.clientHeight
     ) {
-      this.width = this.root.clientWidth;
-      this.height = this.root.clientHeight;
-      console.log(`new width:  ${this.width}`);
-      console.log(`new height: ${this.height}`);
-
-      this.overlay.poll_position();
+      this.width = this.app.clientWidth;
+      this.height = this.app.clientHeight;
+      this.dimensions_update(this.width, this.height);
     }
   }
 
@@ -56,19 +48,6 @@ export abstract class App {
   }
 
   handle_keydown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "ArrowLeft":
-        this.overlay.translate(Translation.LEFT);
-        break;
-      case "ArrowRight":
-        this.overlay.translate(Translation.RIGHT);
-        break;
-      case "ArrowUp":
-        this.overlay.translate(Translation.UP);
-        break;
-      case "ArrowDown":
-        this.overlay.translate(Translation.DOWN);
-        break;
-    }
+    console.log(event);
   }
 }

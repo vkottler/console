@@ -4,8 +4,17 @@ import { Translation } from "../cartesian/Translation";
 import { render } from "preact";
 import { GridElementManager } from "../grid/GridElementManager";
 import { GridArea } from "../grid/GridArea";
+import { AppOverlay } from "../AppOverlay";
 
 export class SampleApp extends App {
+  overlay: AppOverlay;
+
+  constructor(root: Element) {
+    super(root);
+    this.overlay = new AppOverlay(this.app);
+    this.overlay.poll_position();
+  }
+
   init() {
     this.app.style.backgroundColor = "red";
 
@@ -44,5 +53,31 @@ export class SampleApp extends App {
     new_elem.innerHTML = "Hello, world! (2)";
     new_elem.style.backgroundColor = "green";
     grid.createArea("test2", new_elem, new GridArea(1, 1));
+  }
+
+  handle_keydown(event: KeyboardEvent) {
+    switch (event.key) {
+      case "ArrowLeft":
+        this.overlay.translate(Translation.LEFT);
+        break;
+      case "ArrowRight":
+        this.overlay.translate(Translation.RIGHT);
+        break;
+      case "ArrowUp":
+        this.overlay.translate(Translation.UP);
+        break;
+      case "ArrowDown":
+        this.overlay.translate(Translation.DOWN);
+        break;
+    }
+  }
+
+  dimensions_update(width: number, height: number) {
+    super.dimensions_update(width, height);
+    this.overlay.poll_position();
+  }
+
+  dispatch() {
+    this.app.children[1].innerHTML = `time: ${new Date().getTime().toString()}`;
   }
 }
