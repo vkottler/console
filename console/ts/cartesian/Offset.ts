@@ -1,4 +1,4 @@
-import { is_bottom, is_right, RectangleCorner } from "./RectangleCorner";
+import { isBottom, isRight, RectangleCorner } from "./RectangleCorner";
 
 export class Offset {
   left: number;
@@ -11,22 +11,22 @@ export class Offset {
 
   static corner(
     elem: Element,
-    to_fit?: Element,
-    location: RectangleCorner = RectangleCorner.TOP_LEFT
+    toFit?: Element,
+    location: RectangleCorner = RectangleCorner.topLeft
   ): Offset {
     const result = new Offset();
 
-    if (is_right(location)) {
+    if (isRight(location)) {
       let left = elem.clientWidth;
-      if (to_fit != undefined) {
-        left -= to_fit.clientWidth;
+      if (toFit != undefined) {
+        left -= toFit.clientWidth;
       }
       result.left += left;
     }
-    if (is_bottom(location)) {
+    if (isBottom(location)) {
       let top = elem.clientHeight;
-      if (to_fit != undefined) {
-        top -= to_fit.clientHeight;
+      if (toFit != undefined) {
+        top -= toFit.clientHeight;
       }
       result.top += top;
     }

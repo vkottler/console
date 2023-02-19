@@ -3,16 +3,16 @@ import { SampleApp } from "./ts/apps/Grids";
 /*
  * Application entry-point.
  */
-export function init(root_elem: Element) {
-  const app = new SampleApp(root_elem);
+function init(rootElem: Element) {
+  const app = new SampleApp(rootElem);
   setInterval(app.dispatch.bind(app), 100);
 }
 
 /*
  * Initialize the application.
  */
-const app_root = document.body.children.namedItem("app");
-if (app_root) {
-  init(app_root);
+const appRoot = document.body.children.namedItem("app");
+if (appRoot) {
+  init(appRoot);
   console.log("Application initialized.");
 }

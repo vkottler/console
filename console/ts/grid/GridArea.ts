@@ -47,7 +47,7 @@ export class GridArea {
        * If we're on any row besides the first one, we can return the row
        * directly above us.
        */
-      case Translation.UP:
+      case Translation.up:
         if (this.row > 0) {
           result.row = this.row - 1;
         }
@@ -56,7 +56,7 @@ export class GridArea {
        * Set the row to the row that appears below this area. Return the
        * new area if it's within bounds.
        */
-      case Translation.DOWN:
+      case Translation.down:
         result.row = this.row + this.height;
         if (result.row < rows) {
           return result;
@@ -66,7 +66,7 @@ export class GridArea {
        * If we're on any column besides the first one, we can return the column
        * directly to our left.
        */
-      case Translation.LEFT:
+      case Translation.left:
         if (this.column > 0) {
           result.column = this.column - 1;
         }
@@ -75,7 +75,7 @@ export class GridArea {
        * Set the column to the column that appears to the right of this area.
        * Return the new area if it's within bounds.
        */
-      case Translation.RIGHT:
+      case Translation.right:
         result.column = this.column + this.width;
         if (result.column < columns) {
           return result;
@@ -98,7 +98,7 @@ export class GridArea {
       `span ${this.height} / span ${this.width}`;
   }
 
-  update_layout(name: string, layout: string[][]) {
+  updateLayout(name: string, layout: string[][]) {
     for (let row = this.row; row < this.row + this.height; row++) {
       for (let col = this.column; col < this.column + this.width; col++) {
         assert(layout[row][col] == EMPTY);

@@ -1,4 +1,4 @@
-import { is_horizontal, is_vertical, Translation } from "./Translation";
+import { isHorizontal, isVertical, Translation } from "./Translation";
 
 export class GridNode {
   above: Set<GridNode>;
@@ -56,22 +56,22 @@ export class GridNode {
      * Return the first connected node in the provided direction.
      */
     switch (direction) {
-      case Translation.UP:
+      case Translation.up:
         if (this.above.size > 0) {
           return this.above.values().next().value;
         }
         break;
-      case Translation.DOWN:
+      case Translation.down:
         if (this.below.size > 0) {
           return this.below.values().next().value;
         }
         break;
-      case Translation.LEFT:
+      case Translation.left:
         if (this.left.size > 0) {
           return this.left.values().next().value;
         }
         break;
-      case Translation.RIGHT:
+      case Translation.right:
         if (this.right.size > 0) {
           return this.right.values().next().value;
         }
@@ -79,7 +79,7 @@ export class GridNode {
     }
   }
 
-  move_create(direction: Translation): GridNode {
+  moveCreate(direction: Translation): GridNode {
     const result = this.move(direction);
     if (result != undefined) {
       return result;
@@ -89,31 +89,31 @@ export class GridNode {
      * If we have no connected nodes in the specified direction, create a new
      * one.
      */
-    return this.#add_direction(direction);
+    return this.#addDirection(direction);
   }
 
-  #add_direction(direction: Translation): GridNode {
-    const new_node = new GridNode();
+  #addDirection(direction: Translation): GridNode {
+    const newNode = new GridNode();
 
     /*
      * Add direction relationships.
      */
     switch (direction) {
-      case Translation.UP:
-        this.above.add(new_node);
-        new_node.below.add(this);
+      case Translation.up:
+        this.above.add(newNode);
+        newNode.below.add(this);
         break;
-      case Translation.DOWN:
-        this.below.add(new_node);
-        new_node.above.add(this);
+      case Translation.down:
+        this.below.add(newNode);
+        newNode.above.add(this);
         break;
-      case Translation.LEFT:
-        this.left.add(new_node);
-        new_node.right.add(this);
+      case Translation.left:
+        this.left.add(newNode);
+        newNode.right.add(this);
         break;
-      case Translation.RIGHT:
-        this.right.add(new_node);
-        new_node.left.add(this);
+      case Translation.right:
+        this.right.add(newNode);
+        newNode.left.add(this);
         break;
     }
 
@@ -122,16 +122,16 @@ export class GridNode {
      * with the new node. If the direction is horizontal, share our vertically
      * connected nodes.
      */
-    if (is_vertical(direction)) {
-      this.#share_horizontal(new_node);
-    } else if (is_horizontal(direction)) {
-      this.#share_vertical(new_node);
+    if (isVertical(direction)) {
+      this.#shareHorizontal(newNode);
+    } else if (isHorizontal(direction)) {
+      this.#shareVertical(newNode);
     }
 
-    return new_node;
+    return newNode;
   }
 
-  #share_vertical(other: GridNode) {
+  #shareVertical(other: GridNode) {
     for (const above of this.above) {
       other.above.add(above);
       above.below.add(other);
@@ -142,7 +142,7 @@ export class GridNode {
     }
   }
 
-  #share_horizontal(other: GridNode) {
+  #shareHorizontal(other: GridNode) {
     for (const left of this.left) {
       other.left.add(left);
       left.right.add(other);

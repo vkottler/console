@@ -1,18 +1,18 @@
 import { Translation } from "./cartesian/Translation";
 
-function event_direction(event: KeyboardEvent): Translation | undefined {
+function eventDirection(event: KeyboardEvent): Translation | undefined {
   switch (event.key) {
     case "ArrowLeft":
-      return Translation.LEFT;
+      return Translation.left;
       break;
     case "ArrowRight":
-      return Translation.RIGHT;
+      return Translation.right;
       break;
     case "ArrowUp":
-      return Translation.UP;
+      return Translation.up;
       break;
     case "ArrowDown":
-      return Translation.DOWN;
+      return Translation.down;
       break;
   }
 }
@@ -30,52 +30,52 @@ export abstract class App {
     root.appendChild(this.app);
     this.app.style.height = "100%";
 
-    this.register_events();
+    this.registerEvents();
     this.init();
-    this.poll_dimensions();
+    this.pollDimensions();
   }
 
   abstract init(): void | undefined;
 
   abstract dispatch(): void | undefined;
 
-  register_events() {
-    window.onresize = this.poll_dimensions.bind(this);
+  registerEvents() {
+    window.onresize = this.pollDimensions.bind(this);
 
-    document.addEventListener("keydown", this.handle_keydown.bind(this));
-    document.addEventListener("keyup", this.handle_keyup.bind(this));
+    document.addEventListener("keydown", this.handleKeydown.bind(this));
+    document.addEventListener("keyup", this.handleKeyup.bind(this));
   }
 
-  dimensions_update(width: number, height: number) {
+  dimensionsUpdate(width: number, height: number) {
     console.log(`new width:  ${width}`);
     console.log(`new height: ${height}`);
   }
 
-  poll_dimensions() {
+  pollDimensions() {
     if (
       this.width != this.app.clientWidth ||
       this.height != this.app.clientHeight
     ) {
       this.width = this.app.clientWidth;
       this.height = this.app.clientHeight;
-      this.dimensions_update(this.width, this.height);
+      this.dimensionsUpdate(this.width, this.height);
     }
   }
 
-  handle_keyup(event: KeyboardEvent) {
+  handleKeyup(event: KeyboardEvent) {
     console.log(event);
   }
 
-  abstract direction_keydown(
+  abstract directionKeydown(
     event: KeyboardEvent,
     direction: Translation
   ): void | undefined;
 
-  handle_keydown(event: KeyboardEvent) {
-    const direction = event_direction(event);
+  handleKeydown(event: KeyboardEvent) {
+    const direction = eventDirection(event);
 
     if (direction != undefined) {
-      this.direction_keydown(event, direction);
+      this.directionKeydown(event, direction);
     }
   }
 }

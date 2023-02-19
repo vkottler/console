@@ -23,10 +23,10 @@ export class GridNode {
     this.width = width;
     this.height = height;
 
-    this.update_grid_coordinates();
+    this.updateGridCoordinates();
   }
 
-  update_grid_coordinates() {
+  updateGridCoordinates() {
     this.container.style.gridArea = `${this.location.row} / ${this.location.column} / span ${this.height} / span ${this.width}`;
 
     /*
@@ -48,15 +48,15 @@ export class GridNode {
       `(${this.location.row}, ${this.location.column})`;
   }
 
-  update_grid(grid: GridNode[][]) {
+  updateGrid(grid: GridNode[][]) {
     /*
      * Update the grid structure with a reference to this node for every
      * coordinate it appears in.
      */
-    for (let row_idx = 0; row_idx < this.height; row_idx++) {
-      const row = this.location.row + row_idx;
-      for (let column_idx = 0; column_idx < this.width; column_idx++) {
-        const column = this.location.column + column_idx;
+    for (let rowIdx = 0; rowIdx < this.height; rowIdx++) {
+      const row = this.location.row + rowIdx;
+      for (let columnIdx = 0; columnIdx < this.width; columnIdx++) {
+        const column = this.location.column + columnIdx;
         grid[row][column] = this;
       }
     }
@@ -68,7 +68,7 @@ export class GridNode {
     grid?: GridNode[][],
     size = 1
   ): GridNode | undefined {
-    const new_node = new GridNode(
+    const newNode = new GridNode(
       container,
       size,
       size,
@@ -77,10 +77,10 @@ export class GridNode {
     let valid = false;
 
     switch (direction) {
-      case Translation.UP:
+      case Translation.up:
         if (this.height > size) {
           this.height -= size;
-          new_node.width = this.width;
+          newNode.width = this.width;
 
           /*
            * Our location shifts down by 'size' rows.
@@ -90,23 +90,23 @@ export class GridNode {
           valid = true;
         }
         break;
-      case Translation.DOWN:
+      case Translation.down:
         if (this.height > size) {
           this.height -= size;
-          new_node.width = this.width;
+          newNode.width = this.width;
 
           /*
            * Shift the new node's location by 'size' rows.
            */
-          new_node.location.row += size;
+          newNode.location.row += size;
 
           valid = true;
         }
         break;
-      case Translation.LEFT:
+      case Translation.left:
         if (this.width > size) {
           this.width -= size;
-          new_node.height = this.height;
+          newNode.height = this.height;
 
           /*
            * Our location shifts right by 'size' columns.
@@ -116,15 +116,15 @@ export class GridNode {
           valid = true;
         }
         break;
-      case Translation.RIGHT:
+      case Translation.right:
         if (this.width > size) {
           this.width -= size;
-          new_node.height = this.height;
+          newNode.height = this.height;
 
           /*
            * The new node's location shifts right by 'size' columns.
            */
-          new_node.location.column += size;
+          newNode.location.column += size;
 
           valid = true;
         }
@@ -135,12 +135,12 @@ export class GridNode {
      * Only return the new node if it's valid.
      */
     if (valid) {
-      this.update_grid_coordinates();
-      new_node.update_grid_coordinates();
+      this.updateGridCoordinates();
+      newNode.updateGridCoordinates();
       if (grid != undefined) {
-        new_node.update_grid(grid);
+        newNode.updateGrid(grid);
       }
-      return new_node;
+      return newNode;
     }
   }
 }

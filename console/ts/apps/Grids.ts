@@ -1,45 +1,45 @@
 import { App } from "../App";
-import { Translation, translation_name } from "../cartesian/Translation";
+import { Translation, translationName } from "../cartesian/Translation";
 import { GRID_RESIZE } from "../grid/base";
 import { GridDimensions } from "../grid/GridDimensions";
 import { GridElementManager } from "../grid/GridElementManager";
 
 export class SampleApp extends App {
   grid: GridElementManager;
-  overlay_content: HTMLElement;
+  overlayContent: HTMLElement;
 
   constructor(root: Element) {
     /*
      * An overlay for debugging.
      */
-    const overlay_container = document.createElement("div");
+    const overlayContainer = document.createElement("div");
     /* structural */
-    overlay_container.style.position = "absolute";
-    overlay_container.style.left = "5%";
-    overlay_container.style.top = "5%";
-    overlay_container.style.width = "10%";
-    overlay_container.style.height = "10%";
-    overlay_container.style.display = "flex";
-    overlay_container.style.justifyContent = "center";
-    overlay_container.style.alignItems = "center";
+    overlayContainer.style.position = "absolute";
+    overlayContainer.style.left = "5%";
+    overlayContainer.style.top = "5%";
+    overlayContainer.style.width = "10%";
+    overlayContainer.style.height = "10%";
+    overlayContainer.style.display = "flex";
+    overlayContainer.style.justifyContent = "center";
+    overlayContainer.style.alignItems = "center";
 
     /* cosmetic */
-    overlay_container.style.backgroundColor = "blue";
-    overlay_container.style.opacity = "0.7";
+    overlayContainer.style.backgroundColor = "blue";
+    overlayContainer.style.opacity = "0.7";
 
-    const overlay_content = document.createElement("div");
+    const overlayContent = document.createElement("div");
     /* structural */
-    overlay_content.style.textAlign = "center";
+    overlayContent.style.textAlign = "center";
 
     /* cosmetic */
-    overlay_content.style.color = "white";
-    overlay_content.style.opacity = "1";
+    overlayContent.style.color = "white";
+    overlayContent.style.opacity = "1";
 
-    root.appendChild(overlay_container);
-    overlay_container.appendChild(overlay_content);
+    root.appendChild(overlayContainer);
+    overlayContainer.appendChild(overlayContent);
 
     super(root);
-    this.overlay_content = overlay_content;
+    this.overlayContent = overlayContent;
 
     /*
      * Add a handler for the grid-resize event.
@@ -48,7 +48,7 @@ export class SampleApp extends App {
       GRID_RESIZE,
       ((event: CustomEvent<GridDimensions>) => {
         const dimensions = event.detail;
-        this.overlay_content.innerHTML =
+        this.overlayContent.innerHTML =
           `rows: ${dimensions.rows}<br>` + `columns: ${dimensions.columns}`;
       }).bind(this) as EventListener
     );
@@ -70,10 +70,10 @@ export class SampleApp extends App {
     return;
   }
 
-  direction_keydown(event: KeyboardEvent, direction: Translation) {
+  directionKeydown(event: KeyboardEvent, direction: Translation) {
     if (event.ctrlKey) {
       if (!this.grid.contract(direction)) {
-        console.log(`Couldn't contract: '${translation_name(direction)}'.`);
+        console.log(`Couldn't contract: '${translationName(direction)}'.`);
       }
     } else {
       this.grid.expand(direction);

@@ -9,7 +9,7 @@ export class GridElementManagerAreas extends GridElementManagerBase {
 
     /* update the area and grid styling */
 
-    this.update_container();
+    this.updateContainer();
 
     return true;
   }
@@ -21,7 +21,7 @@ export class GridElementManagerAreas extends GridElementManagerBase {
 
     /* remove area and update grid styling */
 
-    this.update_container();
+    this.updateContainer();
 
     return true;
   }

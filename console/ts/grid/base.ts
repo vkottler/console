@@ -13,8 +13,8 @@ export class GridElementManagerBase {
 
   constructor(
     container: HTMLElement,
-    initial_name: string,
-    initial_element: HTMLElement
+    initialName: string,
+    initialElement: HTMLElement
   ) {
     this.container = container;
     this.container.style.display = "grid";
@@ -31,7 +31,7 @@ export class GridElementManagerBase {
     this.dimensions = new GridDimensions();
     this.layout = [[EMPTY]];
     this.cursor = "";
-    this.createArea(initial_name, initial_element);
+    this.createArea(initialName, initialElement);
     this.fireGridResize();
   }
 
@@ -53,7 +53,7 @@ export class GridElementManagerBase {
     );
   }
 
-  protected update_container() {
+  protected updateContainer() {
     /*
      * Update the container's grid-template rows.
      */
@@ -87,7 +87,7 @@ export class GridElementManagerBase {
     this.container.style.gridTemplateAreas = areas;
   }
 
-  handle_cursor(name: string) {
+  handleCursor(name: string) {
     if (name != this.cursor) {
       this.cursor = name;
       console.log(name);
@@ -106,7 +106,7 @@ export class GridElementManagerBase {
     name: string,
     element: HTMLElement,
     area?: GridArea,
-    set_cursor = true
+    setCursor = true
   ): boolean {
     if (area == undefined) {
       area = new GridArea();
@@ -126,14 +126,14 @@ export class GridElementManagerBase {
     /*
      * Update the layout structure.
      */
-    area.update_layout(name, this.layout);
-    this.update_container();
+    area.updateLayout(name, this.layout);
+    this.updateContainer();
 
     /*
      * Set the new cursor.
      */
-    if (set_cursor) {
-      this.handle_cursor(name);
+    if (setCursor) {
+      this.handleCursor(name);
     }
 
     return true;

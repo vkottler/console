@@ -1,57 +1,57 @@
 import {
-  is_horizontal,
-  is_vertical,
+  isHorizontal,
+  isVertical,
   Translation,
 } from "../cartesian/Translation";
 import { GridElementManagerAreas } from "./areas";
 import { EMPTY } from "./GridArea";
 
-function new_row(columns: number): string[] {
-  const new_row = [];
+function newRow(columns: number): string[] {
+  const newRow = [];
   for (let col = 0; col < columns; col++) {
-    new_row.push(EMPTY);
+    newRow.push(EMPTY);
   }
-  return new_row;
+  return newRow;
 }
 
 export class GridElementManager extends GridElementManagerAreas {
   expand(direction: Translation) {
-    let size_changed = false;
+    let sizeChanged = false;
 
     switch (direction) {
-      case Translation.UP:
-        this.layout.unshift(new_row(this.columns));
+      case Translation.up:
+        this.layout.unshift(newRow(this.columns));
         break;
-      case Translation.DOWN:
-        this.layout.push(new_row(this.columns));
+      case Translation.down:
+        this.layout.push(newRow(this.columns));
         break;
-      case Translation.LEFT:
+      case Translation.left:
         for (let row = 0; row < this.rows; row++) {
           this.layout[row].unshift(EMPTY);
         }
         break;
-      case Translation.RIGHT:
+      case Translation.right:
         for (let row = 0; row < this.rows; row++) {
           this.layout[row].push(EMPTY);
         }
         break;
     }
 
-    if (is_vertical(direction)) {
+    if (isVertical(direction)) {
       this.dimensions.rows += 1;
-      size_changed = true;
+      sizeChanged = true;
     }
-    if (is_horizontal(direction)) {
+    if (isHorizontal(direction)) {
       this.dimensions.columns += 1;
-      size_changed = true;
+      sizeChanged = true;
     }
 
-    this.update_container();
+    this.updateContainer();
 
     /*
      * Trigger an event for the size change.
      */
-    if (size_changed) {
+    if (sizeChanged) {
       this.fireGridResize();
     }
   }
@@ -106,31 +106,31 @@ export class GridElementManager extends GridElementManagerAreas {
       /*
        * Attempt to remove the bottom row.
        */
-      case Translation.UP:
+      case Translation.up:
         result = this.#isRowEmpty(this.rows - 1, true);
         break;
       /*
        * Attempt to remove the top row.
        */
-      case Translation.DOWN:
+      case Translation.down:
         result = this.#isRowEmpty(0, true);
         break;
       /*
        * Attempt to remove the furthest-right column.
        */
-      case Translation.LEFT:
+      case Translation.left:
         result = this.#isColumnEmpty(this.columns - 1, true);
         break;
       /*
        * Attempt to remove the furthest-left column.
        */
-      case Translation.RIGHT:
+      case Translation.right:
         result = this.#isColumnEmpty(0, true);
         break;
     }
 
     if (result) {
-      this.update_container();
+      this.updateContainer();
       /*
        * Trigger an event for the size change.
        */

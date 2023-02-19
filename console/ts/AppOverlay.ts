@@ -15,7 +15,7 @@ export class AppOverlay {
 
   constructor(
     root: HTMLElement,
-    location: RectangleCorner = RectangleCorner.BOTTOM_RIGHT,
+    location: RectangleCorner = RectangleCorner.bottomRight,
     scale = 0.5
   ) {
     /*
@@ -57,14 +57,14 @@ export class AppOverlay {
      */
     this.location = location;
     this.offset = new Offset();
-    this.poll_position();
+    this.pollPosition();
   }
 
-  poll_position(location?: RectangleCorner) {
+  pollPosition(location?: RectangleCorner) {
     /*
      * Update dimensions.
      */
-    const dimensions = Dimensions.from_element(this.root, true, this.scale);
+    const dimensions = Dimensions.fromElement(this.root, true, this.scale);
     dimensions.apply(this.container);
 
     /*
@@ -82,6 +82,6 @@ export class AppOverlay {
   }
 
   translate(translation: Translation) {
-    this.poll_position(translate(this.location, translation));
+    this.pollPosition(translate(this.location, translation));
   }
 }

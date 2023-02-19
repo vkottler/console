@@ -7,7 +7,7 @@ export class Dimensions {
     this.height = height;
   }
 
-  static from_element(elem: Element, square = false, scale = 1.0): Dimensions {
+  static fromElement(elem: Element, square = false, scale = 1.0): Dimensions {
     let width = elem.clientWidth;
     let height = elem.clientHeight;
 

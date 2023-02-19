@@ -2,7 +2,7 @@
  * Just to a test to see if our JSX integration is working.
  */
 const message = "Hello, world!!!";
-export const test_elem = (
+export const testElem = (
   <div>
     {message}
     <div style="display: grid; background: orange; width: 50%; grid-template-columns: auto auto auto">

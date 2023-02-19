@@ -7,11 +7,11 @@ export class Table {
     this.columns = columns;
   }
 
-  add_row() {
+  addRow() {
     this.rows += 1;
   }
 
-  add_column() {
+  addColumn() {
     this.columns += 1;
   }
 }
@@ -59,11 +59,11 @@ export class RectangleManager {
     this.container.appendChild(this.active);
   }
 
-  split_vertically() {
+  splitVertically() {
     console.log("vertical split");
   }
 
-  split_horizontally() {
+  splitHorizontally() {
     console.log("horizontal split");
   }
 }

@@ -1,31 +1,31 @@
 import { RectangleCorner } from "./RectangleCorner";
 
 export enum Translation {
-  UP,
-  DOWN,
-  LEFT,
-  RIGHT,
+  up,
+  down,
+  left,
+  right,
 }
 
-export function translation_name(translation: Translation) {
+export function translationName(translation: Translation) {
   switch (translation) {
-    case Translation.UP:
+    case Translation.up:
       return "up";
-    case Translation.DOWN:
+    case Translation.down:
       return "down";
-    case Translation.LEFT:
+    case Translation.left:
       return "left";
-    case Translation.RIGHT:
+    case Translation.right:
       return "right";
   }
 }
 
-export function is_vertical(direction: Translation) {
-  return direction == Translation.UP || direction == Translation.DOWN;
+export function isVertical(direction: Translation) {
+  return direction == Translation.up || direction == Translation.down;
 }
 
-export function is_horizontal(direction: Translation) {
-  return direction == Translation.LEFT || direction == Translation.RIGHT;
+export function isHorizontal(direction: Translation) {
+  return direction == Translation.left || direction == Translation.right;
 }
 
 export function translate(
@@ -33,16 +33,16 @@ export function translate(
   translation: Translation
 ): RectangleCorner {
   switch (translation) {
-    case Translation.UP:
+    case Translation.up:
       location &= 1;
       break;
-    case Translation.DOWN:
+    case Translation.down:
       location |= 2;
       break;
-    case Translation.LEFT:
+    case Translation.left:
       location &= 2;
       break;
-    case Translation.RIGHT:
+    case Translation.right:
       location |= 1;
       break;
   }

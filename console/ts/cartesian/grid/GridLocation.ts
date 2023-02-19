@@ -12,14 +12,14 @@ export class GridLocation {
      * Return whether or not the cursor was invalid, indicating that
      * sanitization changed the cursor value.
      */
-    let is_valid = 0 <= this.row && this.row < rows;
-    is_valid &&= 0 <= this.column && this.column < columns;
+    let isValid = 0 <= this.row && this.row < rows;
+    isValid &&= 0 <= this.column && this.column < columns;
 
     this.row = Math.min(rows - 1, this.row);
     this.row = Math.max(0, this.row);
     this.column = Math.min(columns - 1, this.column);
     this.column = Math.max(0, this.column);
 
-    return !is_valid;
+    return !isValid;
   }
 }

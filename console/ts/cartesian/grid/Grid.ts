@@ -23,7 +23,7 @@ export class Grid {
     return this.nodes[this.cursor.row][this.cursor.column];
   }
 
-  *row_nodes(row = 0, min_column = 0): Generator<GridNode> {
+  *rowNodes(row = 0, minColumn = 0): Generator<GridNode> {
     const visited = new Set();
     for (const column in this.nodes[row]) {
       const node = this.nodes[row][column];
@@ -33,14 +33,14 @@ export class Grid {
          * always consider it visited.
          */
         visited.add(node);
-        if (+column >= min_column) {
+        if (+column >= minColumn) {
           yield node;
         }
       }
     }
   }
 
-  *column_nodes(column = 0, min_row = 0): Generator<GridNode> {
+  *columnNodes(column = 0, minRow = 0): Generator<GridNode> {
     const visited = new Set();
     for (const row in this.nodes) {
       const node = this.nodes[row][column];
@@ -50,39 +50,39 @@ export class Grid {
          * always consider it visited.
          */
         visited.add(node);
-        if (+row >= min_row) {
+        if (+row >= minRow) {
           yield node;
         }
       }
     }
   }
 
-  split_current(
+  splitCurrent(
     container: HTMLElement,
     direction: Translation,
     size = 1
   ): boolean {
-    const new_node = this.current().split(
+    const newNode = this.current().split(
       container,
       direction,
       this.nodes,
       size
     );
-    return new_node != undefined;
+    return newNode != undefined;
   }
 
-  move_cursor(direction: Translation, expand = false) {
+  moveCursor(direction: Translation, expand = false) {
     switch (direction) {
-      case Translation.UP:
+      case Translation.up:
         this.cursor.row -= 1;
         break;
-      case Translation.DOWN:
+      case Translation.down:
         this.cursor.row += 1;
         break;
-      case Translation.LEFT:
+      case Translation.left:
         this.cursor.column -= 1;
         break;
-      case Translation.RIGHT:
+      case Translation.right:
         this.cursor.column += 1;
         break;
     }
@@ -93,24 +93,24 @@ export class Grid {
   }
 
   expand(direction: Translation) {
-    const new_row = [];
+    const newRow = [];
     const visited = new Set();
 
     switch (direction) {
-      case Translation.UP:
+      case Translation.up:
         for (const node of this.nodes[0]) {
           /*
            * Only update node height's once.
            */
           if (!visited.has(node)) {
             node.height += 1;
-            node.update_grid_coordinates();
+            node.updateGridCoordinates();
             visited.add(node);
           }
 
-          new_row.push(node);
+          newRow.push(node);
         }
-        this.nodes.unshift(new_row);
+        this.nodes.unshift(newRow);
         this.rows += 1;
 
         /*
@@ -119,37 +119,37 @@ export class Grid {
          */
         visited.clear();
         for (let column = 0; column < this.columns; column++) {
-          for (const node of this.column_nodes(column, 1)) {
+          for (const node of this.columnNodes(column, 1)) {
             /*
              * Only update each node once.
              */
             if (!visited.has(node)) {
               node.location.row += 1;
-              node.update_grid_coordinates();
+              node.updateGridCoordinates();
               visited.add(node);
             }
           }
         }
         break;
 
-      case Translation.DOWN:
+      case Translation.down:
         for (const node of this.nodes[this.rows - 1]) {
           /*
            * Only update node height's once.
            */
           if (!visited.has(node)) {
             node.height += 1;
-            node.update_grid_coordinates();
+            node.updateGridCoordinates();
             visited.add(node);
           }
 
-          new_row.push(node);
+          newRow.push(node);
         }
-        this.nodes.push(new_row);
+        this.nodes.push(newRow);
         this.rows += 1;
         break;
 
-      case Translation.LEFT:
+      case Translation.left:
         for (const column of this.nodes) {
           const node = column[0];
 
@@ -158,7 +158,7 @@ export class Grid {
            */
           if (!visited.has(node)) {
             node.width += 1;
-            node.update_grid_coordinates();
+            node.updateGridCoordinates();
             visited.add(node);
           }
 
@@ -172,20 +172,20 @@ export class Grid {
          */
         visited.clear();
         for (let row = 0; row < this.rows; row++) {
-          for (const node of this.row_nodes(row, 1)) {
+          for (const node of this.rowNodes(row, 1)) {
             /*
              * Only update each node once.
              */
             if (!visited.has(node)) {
               node.location.column += 1;
-              node.update_grid_coordinates();
+              node.updateGridCoordinates();
               visited.add(node);
             }
           }
         }
         break;
 
-      case Translation.RIGHT:
+      case Translation.right:
         for (const column of this.nodes) {
           const node = column[this.columns - 1];
 
@@ -194,7 +194,7 @@ export class Grid {
            */
           if (!visited.has(node)) {
             node.width += 1;
-            node.update_grid_coordinates();
+            node.updateGridCoordinates();
             visited.add(node);
           }
 
