@@ -4,6 +4,7 @@ import { Translation } from "../cartesian/Translation";
 import { GridDimensions } from "./GridDimensions";
 
 export const EMPTY = ".";
+export const INIT_ID = -1;
 
 export class GridLocation {
   row: number;
@@ -15,16 +16,32 @@ export class GridLocation {
   }
 }
 
+export function areaName(areaId: number): string {
+  assert(areaId >= 0);
+  return "area-" + areaId.toString();
+}
+
 export class GridArea {
   location: GridLocation;
   dimensions: GridDimensions;
+  areaId: number;
 
-  constructor(location?: GridLocation, height = 1, width = 1) {
+  constructor(
+    location?: GridLocation,
+    height = 1,
+    width = 1,
+    areaId = INIT_ID
+  ) {
     if (location == undefined) {
       location = new GridLocation();
     }
     this.location = location;
     this.dimensions = new GridDimensions(height, width);
+    this.areaId = areaId;
+  }
+
+  get name(): string {
+    return areaName(this.areaId);
   }
 
   get height(): number {
@@ -35,11 +52,8 @@ export class GridArea {
     return this.dimensions.width;
   }
 
-  translate(
-    direction: Translation,
-    rows: number,
-    columns: number
-  ): GridLocation | undefined {
+  translate(direction: Translation, dimensions: GridDimensions): boolean {
+    let valid = false;
     const result = new GridLocation(this.row, this.column);
 
     switch (direction) {
@@ -51,15 +65,16 @@ export class GridArea {
         if (this.row > 0) {
           result.row = this.row - 1;
         }
-        return result;
+        valid = true;
+        break;
       /*
        * Set the row to the row that appears below this area. Return the
        * new area if it's within bounds.
        */
       case Translation.down:
         result.row = this.row + this.height;
-        if (result.row < rows) {
-          return result;
+        if (result.row < dimensions.rows) {
+          valid = true;
         }
         break;
       /*
@@ -70,18 +85,31 @@ export class GridArea {
         if (this.column > 0) {
           result.column = this.column - 1;
         }
-        return result;
+        valid = true;
+        break;
       /*
        * Set the column to the column that appears to the right of this area.
        * Return the new area if it's within bounds.
        */
       case Translation.right:
         result.column = this.column + this.width;
-        if (result.column < columns) {
-          return result;
+        if (result.column < dimensions.columns) {
+          valid = true;
         }
         break;
     }
+
+    /*
+     * Need to move this into the grid layout class?
+    if (valid) {
+      valid = this.validate(dimensions, layout, result);
+      if (valid) {
+        this.location = result;
+      }
+    }
+    */
+
+    return valid;
   }
 
   get row() {
@@ -96,47 +124,5 @@ export class GridArea {
     element.style.gridArea =
       `${this.row + 1} / ${this.column + 1} / ` +
       `span ${this.height} / span ${this.width}`;
-  }
-
-  updateLayout(name: string, layout: string[][]) {
-    for (let row = this.row; row < this.row + this.height; row++) {
-      for (let col = this.column; col < this.column + this.width; col++) {
-        assert(layout[row][col] == EMPTY);
-        layout[row][col] = name;
-      }
-    }
-  }
-
-  validate(rows: number, columns: number, layout?: string[][]) {
-    /*
-     * Validate location.
-     */
-    let result = 0 <= this.row && this.row < rows;
-    result &&= 0 <= this.column && this.column < columns;
-
-    /*
-     * Validate size.
-     */
-    result &&= this.row + this.height <= rows;
-    result &&= this.column + this.width <= columns;
-
-    if (layout != undefined && result) {
-      /*
-       * Validate that the layout isn't occupied anywhere this area would appear.
-       */
-      for (let row = this.row; row < this.row + this.height; row++) {
-        for (
-          let column = this.column;
-          column < this.column + this.height;
-          column++
-        ) {
-          if (layout[row][column] != EMPTY) {
-            return false;
-          }
-        }
-      }
-    }
-
-    return result;
   }
 }

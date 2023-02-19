@@ -1,5 +1,6 @@
-import { EMPTY, GridArea } from "./GridArea";
+import { GridArea } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
+import { GridLayout } from "./GridLayout";
 
 export const GRID_RESIZE = "gridResize";
 export const ERROR_MESSAGE = "errorMessage";
@@ -8,10 +9,7 @@ export class GridElementManagerBase {
   container: HTMLElement;
   areas: Map<number, GridArea>;
   elements: Map<number, HTMLElement>;
-  dimensions: GridDimensions;
-  layout: string[][];
-  cursor: number;
-  nextAreaId: number;
+  layout: GridLayout;
 
   constructor(container: HTMLElement, initialElement: HTMLElement) {
     this.container = container;
@@ -26,12 +24,14 @@ export class GridElementManagerBase {
     this.areas = new Map<number, GridArea>();
     this.elements = new Map<number, HTMLElement>();
 
-    this.dimensions = new GridDimensions();
-    this.layout = [[EMPTY]];
-    this.nextAreaId = 0;
-    this.cursor = -1;
+    this.layout = new GridLayout();
+
     this.createArea(initialElement);
     this.fireGridResize();
+  }
+
+  get dimensions(): GridDimensions {
+    return this.layout.dimensions;
   }
 
   get rows(): number {
@@ -40,10 +40,6 @@ export class GridElementManagerBase {
 
   get columns(): number {
     return this.dimensions.columns;
-  }
-
-  validate(area: GridArea): boolean {
-    return area.validate(this.rows, this.columns, this.layout);
   }
 
   protected fireGridResize() {
@@ -59,92 +55,50 @@ export class GridElementManagerBase {
   }
 
   protected updateContainer() {
-    /*
-     * Update the container's grid-template rows.
-     */
-    let line = [];
-    for (let row = 0; row < this.rows; row++) {
-      line.push("auto");
-    }
-
-    /*
-     * Update the container's grid-template columns.
-     */
-    line = [];
-    for (let column = 0; column < this.columns; column++) {
-      line.push("auto");
-    }
-
-    /*
-     * Update the container's grid-template areas;
-     */
-    let areas = "";
-    for (let row = 0; row < this.rows; row++) {
-      line = [];
-      for (let column = 0; column < this.columns; column++) {
-        line.push(this.layout[row][column]);
-      }
-      areas += '"' + line.join(" ") + '"';
-      if (row < this.rows - 1) {
-        areas += "\n";
-      }
-    }
-    this.container.style.gridTemplateAreas = areas;
+    this.layout.apply(this.container);
   }
 
   handleCursor(areaId: number) {
-    if (areaId != this.cursor) {
-      this.cursor = areaId;
+    if (areaId != this.layout.cursor) {
+      this.layout.cursor = areaId;
 
       /*
        * Set a style for the highlighted element.
        */
-      const elem = this.elements.get(this.cursor);
+      const elem = this.elements.get(this.layout.cursor);
       if (elem != undefined) {
         elem.style.backgroundColor = "yellow";
       }
     }
   }
 
-  areaName(areaId: number): string {
-    return "area-" + areaId.toString();
-  }
-
-  #getNextAreaId(): number {
-    const result = this.nextAreaId;
-    this.nextAreaId++;
-    return result;
-  }
-
   createArea(element: HTMLElement, area?: GridArea, setCursor = true): boolean {
     if (area == undefined) {
-      area = new GridArea();
-      /* update this so it's in an unallocated location? */
+      area = this.layout.createArea(element);
+    } else {
+      this.layout.assignId(area, element);
     }
 
-    if (!this.validate(area)) {
+    if (!this.layout.validArea(area)) {
+      this.fireErrorMessage("New area is invalid.");
       return false;
     }
 
-    const areaId = this.#getNextAreaId();
-    this.areas.set(areaId, area);
-    this.elements.set(areaId, element);
-
-    const areaName = this.areaName(areaId);
-    element.style.gridArea = areaName;
+    this.areas.set(area.areaId, area);
+    this.elements.set(area.areaId, element);
     this.container.appendChild(element);
 
     /*
      * Update the layout structure.
      */
-    area.updateLayout(areaName, this.layout);
+    this.layout.update(area);
     this.updateContainer();
 
     /*
      * Set the new cursor.
      */
     if (setCursor) {
-      this.handleCursor(areaId);
+      this.handleCursor(area.areaId);
     }
 
     return true;
