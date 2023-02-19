@@ -2,19 +2,10 @@ import assert from "assert";
 
 import { Translation } from "../cartesian/Translation";
 import { GridDimensions } from "./GridDimensions";
+import { GridLocation } from "./GridLocation";
 
 export const EMPTY = ".";
 export const INIT_ID = -1;
-
-export class GridLocation {
-  row: number;
-  column: number;
-
-  constructor(row = 0, column = 0) {
-    this.row = row;
-    this.column = column;
-  }
-}
 
 export function areaName(areaId: number): string {
   assert(areaId >= 0);
