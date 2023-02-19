@@ -2,20 +2,18 @@ import { EMPTY, GridArea } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
 
 export const GRID_RESIZE = "gridResize";
+export const ERROR_MESSAGE = "errorMessage";
 
 export class GridElementManagerBase {
   container: HTMLElement;
-  areas: Map<string, GridArea>;
-  elements: Map<string, HTMLElement>;
+  areas: Map<number, GridArea>;
+  elements: Map<number, HTMLElement>;
   dimensions: GridDimensions;
   layout: string[][];
-  cursor: string;
+  cursor: number;
+  nextAreaId: number;
 
-  constructor(
-    container: HTMLElement,
-    initialName: string,
-    initialElement: HTMLElement
-  ) {
+  constructor(container: HTMLElement, initialElement: HTMLElement) {
     this.container = container;
     this.container.style.display = "grid";
 
@@ -25,13 +23,14 @@ export class GridElementManagerBase {
     this.container.style.gridAutoRows = "1fr";
     this.container.style.gridAutoColumns = "1fr";
 
-    this.areas = new Map<string, GridArea>();
-    this.elements = new Map<string, HTMLElement>();
+    this.areas = new Map<number, GridArea>();
+    this.elements = new Map<number, HTMLElement>();
 
     this.dimensions = new GridDimensions();
     this.layout = [[EMPTY]];
-    this.cursor = "";
-    this.createArea(initialName, initialElement);
+    this.nextAreaId = 0;
+    this.cursor = -1;
+    this.createArea(initialElement);
     this.fireGridResize();
   }
 
@@ -50,6 +49,12 @@ export class GridElementManagerBase {
   protected fireGridResize() {
     this.container.dispatchEvent(
       new CustomEvent<GridDimensions>(GRID_RESIZE, { detail: this.dimensions })
+    );
+  }
+
+  fireErrorMessage(message: string) {
+    this.container.dispatchEvent(
+      new CustomEvent<string>(ERROR_MESSAGE, { detail: message })
     );
   }
 
@@ -87,53 +92,59 @@ export class GridElementManagerBase {
     this.container.style.gridTemplateAreas = areas;
   }
 
-  handleCursor(name: string) {
-    if (name != this.cursor) {
-      this.cursor = name;
-      console.log(name);
+  handleCursor(areaId: number) {
+    if (areaId != this.cursor) {
+      this.cursor = areaId;
 
       /*
        * Set a style for the highlighted element.
        */
-      const elem = this.elements.get(name);
+      const elem = this.elements.get(this.cursor);
       if (elem != undefined) {
         elem.style.backgroundColor = "yellow";
       }
     }
   }
 
-  createArea(
-    name: string,
-    element: HTMLElement,
-    area?: GridArea,
-    setCursor = true
-  ): boolean {
+  areaName(areaId: number): string {
+    return "area-" + areaId.toString();
+  }
+
+  #getNextAreaId(): number {
+    const result = this.nextAreaId;
+    this.nextAreaId++;
+    return result;
+  }
+
+  createArea(element: HTMLElement, area?: GridArea, setCursor = true): boolean {
     if (area == undefined) {
       area = new GridArea();
       /* update this so it's in an unallocated location? */
     }
 
-    if (name in this.areas || !this.validate(area)) {
+    if (!this.validate(area)) {
       return false;
     }
 
-    this.areas.set(name, area);
-    this.elements.set(name, element);
+    const areaId = this.#getNextAreaId();
+    this.areas.set(areaId, area);
+    this.elements.set(areaId, element);
 
-    element.style.gridArea = name;
+    const areaName = this.areaName(areaId);
+    element.style.gridArea = areaName;
     this.container.appendChild(element);
 
     /*
      * Update the layout structure.
      */
-    area.updateLayout(name, this.layout);
+    area.updateLayout(areaName, this.layout);
     this.updateContainer();
 
     /*
      * Set the new cursor.
      */
     if (setCursor) {
-      this.handleCursor(name);
+      this.handleCursor(areaId);
     }
 
     return true;

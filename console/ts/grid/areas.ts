@@ -2,8 +2,8 @@ import { GridElementManagerBase } from "./base";
 import { GridArea } from "./GridArea";
 
 export class GridElementManagerAreas extends GridElementManagerBase {
-  updateArea(name: string, area: GridArea): boolean {
-    if (!(name in this.areas) || !this.validate(area)) {
+  updateArea(areaId: number, area: GridArea): boolean {
+    if (!(areaId in this.areas) || !this.validate(area)) {
       return false;
     }
 
@@ -14,8 +14,8 @@ export class GridElementManagerAreas extends GridElementManagerBase {
     return true;
   }
 
-  removeArea(name: string): boolean {
-    if (!(name in this.areas)) {
+  removeArea(areaId: number): boolean {
+    if (!(areaId in this.areas)) {
       return false;
     }
 
