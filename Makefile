@@ -8,37 +8,23 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: build edit env server
+.PHONY: edit env host-coverage server
+
+# Link the project directory to the 'src' directory.
+$($(PROJ)_DIR)/$(PROJ):
+	cd $($(PROJ)_DIR) && ln -s src $(PROJ)
 
 .DEFAULT_GOAL := host
 
-# Link 'src' to the project directory.
-$($(PROJ)_DIR)/src:
-	cd $($(PROJ)_DIR) && ln -s $(PROJ) src
-
-env: $(VENV_CONC) $($(PROJ)_DIR)/src
+env: $(VENV_CONC) $($(PROJ)_DIR)/$(PROJ)
 
 edit: env $(PY_PREFIX)edit
 
-host: env
-	npx parcel --no-cache
-
-format: env
-	npx eslint --fix $($(PROJ)_DIR)/src
-	npx prettier -w $($(PROJ)_DIR)/src
-
-lint: env
-	npx eslint $($(PROJ)_DIR)/src
-	npx prettier --check $($(PROJ)_DIR)/src
-
-test: env
-	npx jest --coverage
+host-coverage:
+	cd $($(PROJ)_DIR)/coverage/lcov-report && python -m http.server 0
 
 test-%: env
 	npx jest -t $*
-
-build: env
-	npx parcel build
 
 server: env
 	$(PYTHON) $($(PROJ)_DIR)/server.py 0.0.0.0 0

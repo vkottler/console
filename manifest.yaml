@@ -1,26 +1,22 @@
 ---
 default_target: groups-all
 
-params:
-  project: console
-
-configs:
-  - local/configs
-  - config/configs
-
-variables:
-  - local/variables
-  - config/variables
+includes:
+  - config/includes/license.yaml
+  - config/includes/funding.yaml
 
 templates:
   - local/templates
   - config/templates
 
-schemas:
-  - config/schemas
-
 compiles:
-  - name: html
+  - name: local
+    configs:
+      - local/configs
+      - config/configs
+    variables:
+      - local/variables
+      - config/variables
 
 renders:
   - name: app.html
@@ -28,16 +24,18 @@ renders:
     indent: 4
     no_file: true
     dependencies:
-      - html
+      - local
 
   - name: index.html
-    output_dir: "{{project}}"
+    output_dir: src
     key: basic.html
     dependencies:
-      - html
+      - local
       - renders-app.html
 
 groups:
   - name: all
     dependencies:
       - renders-index.html
+      - groups-license
+      - groups-funding

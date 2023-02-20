@@ -8,5 +8,6 @@ dist
 datazen-out
 tags
 node_modules
-src
 coverage
+__pycache__
+console

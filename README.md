@@ -1,3 +1,3 @@
 # console
 
-A web-front end for application control.
+A web front-end for hardware projects.
