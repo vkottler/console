@@ -4,6 +4,7 @@ default_target: groups-all
 includes:
   - config/includes/license.yaml
   - config/includes/funding.yaml
+  - config/includes/node.yaml
 
 templates:
   - local/templates
@@ -33,9 +34,17 @@ renders:
       - local
       - renders-app.html
 
+  - name: README.md
+    output_dir: "."
+    dependencies:
+      - compiles-local
+      - renders-node_readme_header.md
+
 groups:
   - name: all
     dependencies:
       - renders-index.html
+      - renders-README.md
+      - groups-node-package-renders
       - groups-license
       - groups-funding
