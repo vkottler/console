@@ -10,6 +10,7 @@
     "@types/jest": "^29.4.0",
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
+    "assert": "^2.0.0",
     "csslint": "^1.0.5",
     "eslint": "^8.34.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
