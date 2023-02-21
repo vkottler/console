@@ -13,16 +13,18 @@ export class GridLocation {
   translate(
     translation: Translation,
     bounds?: GridDimensions,
-    objectSize?: GridDimensions
+    objectSize?: GridDimensions,
+    update = false
   ): GridLocation | undefined {
     const result = new GridLocation(this.row, this.column);
+    let valid = false;
     let toCompare = 0;
 
     switch (translation) {
       case Translation.up:
         if (result.row > 0) {
           result.row--;
-          return result;
+          valid = true;
         }
         break;
       case Translation.down:
@@ -33,14 +35,14 @@ export class GridLocation {
           toCompare += objectSize.height;
         }
 
-        if (bounds != undefined && toCompare < bounds.rows) {
-          return result;
+        if (bounds != undefined && toCompare <= bounds.rows) {
+          valid = true;
         }
         break;
       case Translation.left:
         if (result.column > 0) {
           result.column--;
-          return result;
+          valid = true;
         }
         break;
       case Translation.right:
@@ -51,10 +53,19 @@ export class GridLocation {
           toCompare += objectSize.width;
         }
 
-        if (bounds != undefined && toCompare < bounds.columns) {
-          return result;
+        if (bounds != undefined && toCompare <= bounds.columns) {
+          valid = true;
         }
         break;
+    }
+
+    if (valid) {
+      if (update) {
+        this.row = result.row;
+        this.column = result.column;
+        return this;
+      }
+      return result;
     }
   }
 }

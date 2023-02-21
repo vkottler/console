@@ -20,11 +20,11 @@ export function translationName(translation: Translation) {
   }
 }
 
-export function isVertical(direction: Translation) {
+export function isVertical(direction: Translation): boolean {
   return direction == Translation.up || direction == Translation.down;
 }
 
-export function isHorizontal(direction: Translation) {
+export function isHorizontal(direction: Translation): boolean {
   return direction == Translation.left || direction == Translation.right;
 }
 
