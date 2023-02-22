@@ -10,6 +10,12 @@ export class GridLocation {
     this.column = column;
   }
 
+  set(row: number, column: number): GridLocation {
+    this.row = row;
+    this.column = column;
+    return this;
+  }
+
   inBounds(bounds: GridDimensions, objectSize?: GridDimensions): boolean {
     let valid = this.row < bounds.rows && this.column < bounds.columns;
 

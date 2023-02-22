@@ -214,4 +214,8 @@ export class GridArea {
   get column() {
     return this.location.column;
   }
+
+  apply(element: HTMLElement) {
+    element.style.gridArea = this.name;
+  }
 }
