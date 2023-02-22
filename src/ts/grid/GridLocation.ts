@@ -10,6 +10,22 @@ export class GridLocation {
     this.column = column;
   }
 
+  inBounds(bounds: GridDimensions, objectSize?: GridDimensions): boolean {
+    let valid = this.row < bounds.rows && this.column < bounds.columns;
+
+    /*
+     * If we're checking an object with dimensions, add them to obtain the
+     * maximum row and column.
+     */
+    if (objectSize != undefined && valid) {
+      valid =
+        this.row + objectSize.height <= bounds.rows &&
+        this.column + objectSize.width <= bounds.columns;
+    }
+
+    return valid;
+  }
+
   translate(
     translation: Translation,
     bounds?: GridDimensions,
@@ -18,7 +34,6 @@ export class GridLocation {
   ): GridLocation | undefined {
     const result = new GridLocation(this.row, this.column);
     let valid = false;
-    let toCompare = 0;
 
     switch (translation) {
       case Translation.up:
@@ -29,16 +44,7 @@ export class GridLocation {
         break;
       case Translation.down:
         result.row++;
-        toCompare = result.row;
-
-        if (objectSize != undefined) {
-          toCompare += objectSize.height;
-        }
-
         valid = true;
-        if (bounds != undefined) {
-          valid = toCompare <= bounds.rows;
-        }
         break;
       case Translation.left:
         if (result.column > 0) {
@@ -48,17 +54,13 @@ export class GridLocation {
         break;
       case Translation.right:
         result.column++;
-        toCompare = result.column;
-
-        if (objectSize != undefined) {
-          toCompare += objectSize.width;
-        }
-
         valid = true;
-        if (bounds != undefined) {
-          valid = toCompare <= bounds.columns;
-        }
         break;
+    }
+
+    /* Consider bounds and the object's size if provided. */
+    if (bounds != undefined && valid) {
+      valid = result.inBounds(bounds, objectSize);
     }
 
     if (valid) {
