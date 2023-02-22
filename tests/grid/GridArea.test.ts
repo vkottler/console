@@ -29,6 +29,8 @@ describe("Testing the 'GridArea' module.", () => {
     expect(area.translate(Translation.down, bounds)).toBeInstanceOf(
       GridLocation
     );
+
+    area.apply(document.createElement("div"));
   });
 
   test("Grid area expanding.", () => {
