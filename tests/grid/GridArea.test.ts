@@ -61,4 +61,21 @@ describe("Testing the 'GridArea' module.", () => {
     expect(area.expand(Translation.left, bounds)).toBe(false);
     expect(area.expand(Translation.up, bounds)).toBe(false);
   });
+
+  test("Grid area contracting.", () => {
+    const area = new GridArea();
+
+    /* Expand. */
+    expect(area.expand(Translation.right)).toBe(true);
+    expect(area.expand(Translation.down)).toBe(true);
+
+    /* Contract. */
+    expect(area.contract(Translation.right)).toBe(true);
+    expect(area.contract(Translation.down)).toBe(true);
+    expect(area.width).toBe(1);
+    expect(area.height).toBe(1);
+
+    expect(area.contract(Translation.left)).toBe(false);
+    expect(area.contract(Translation.up)).toBe(false);
+  });
 });

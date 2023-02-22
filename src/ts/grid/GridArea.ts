@@ -45,6 +45,37 @@ export class GridArea {
     return this.location.translate(direction, bounds, this.dimensions, update);
   }
 
+  contract(direction: Translation, update = true): boolean {
+    if (isVertical(direction)) {
+      /* Ensure height is greater than one. */
+      if (this.height <= 1) {
+        return false;
+      }
+      if (update) {
+        this.dimensions.rows--;
+      }
+    }
+
+    /* Ensure width is greater than one. */
+    if (isHorizontal(direction)) {
+      if (this.width <= 1) {
+        return false;
+      }
+      if (update) {
+        this.dimensions.columns--;
+      }
+    }
+
+    /*
+     * When contracting down or to the right, we also need to translate in that
+     * direction.
+     */
+    if (direction == Translation.right || direction == Translation.down) {
+      assert(this.translate(direction, undefined, update) != undefined);
+    }
+    return true;
+  }
+
   expand(
     direction: Translation,
     bounds?: GridDimensions,

@@ -35,8 +35,9 @@ export class GridLocation {
           toCompare += objectSize.height;
         }
 
-        if (bounds != undefined && toCompare <= bounds.rows) {
-          valid = true;
+        valid = true;
+        if (bounds != undefined) {
+          valid = toCompare <= bounds.rows;
         }
         break;
       case Translation.left:
@@ -53,8 +54,9 @@ export class GridLocation {
           toCompare += objectSize.width;
         }
 
-        if (bounds != undefined && toCompare <= bounds.columns) {
-          valid = true;
+        valid = true;
+        if (bounds != undefined) {
+          valid = toCompare <= bounds.columns;
         }
         break;
     }
