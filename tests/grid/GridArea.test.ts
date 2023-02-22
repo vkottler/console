@@ -78,4 +78,77 @@ describe("Testing the 'GridArea' module.", () => {
     expect(area.contract(Translation.left)).toBe(false);
     expect(area.contract(Translation.up)).toBe(false);
   });
+
+  test("Locations being inside grid areas.", () => {
+    const area = new GridArea();
+
+    expect(area.topLeft.row).toBe(0);
+    expect(area.topLeft.column).toBe(0);
+
+    expect(area.topRight.row).toBe(0);
+    expect(area.topRight.column).toBe(1);
+
+    expect(area.bottomLeft.row).toBe(1);
+    expect(area.bottomLeft.column).toBe(0);
+
+    expect(area.bottomRight.row).toBe(1);
+    expect(area.bottomRight.column).toBe(1);
+
+    const location = new GridLocation(0, 0);
+    expect(area.inArea(location)).toBe(false);
+    location.row++;
+    expect(area.inArea(location)).toBe(false);
+    location.column++;
+    expect(area.inArea(location)).toBe(false);
+    location.column--;
+    expect(area.inArea(location)).toBe(false);
+
+    /* Expand the area. */
+    area.expand(Translation.right);
+    area.expand(Translation.down);
+
+    /* The only point in the area. */
+    location.row = 1;
+    location.column = 1;
+    expect(area.inArea(location)).toBe(true);
+
+    for (const corner of area.corners()) {
+      expect(corner.row).toBeGreaterThanOrEqual(0);
+      expect(corner.column).toBeGreaterThanOrEqual(0);
+    }
+
+    const locations = [];
+    for (const location of area.locations()) {
+      locations.push(location);
+    }
+  });
+
+  test("Iterating over all locations.", () => {
+    const area = new GridArea();
+
+    let locations = [];
+    for (const location of area.locations()) {
+      locations.push(location);
+    }
+
+    expect(locations.length).toBe(4);
+
+    area.expand(Translation.right);
+
+    locations = [];
+    for (const location of area.locations()) {
+      locations.push(location);
+    }
+
+    expect(locations.length).toBe(6);
+
+    area.expand(Translation.down);
+
+    locations = [];
+    for (const location of area.locations()) {
+      locations.push(location);
+    }
+
+    expect(locations.length).toBe(9);
+  });
 });
