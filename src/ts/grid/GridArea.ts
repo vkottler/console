@@ -1,6 +1,11 @@
 import assert from "assert";
 
 import {
+  isBottom,
+  isRight,
+  RectangleCorner,
+} from "../cartesian/RectangleCorner";
+import {
   isHorizontal,
   isVertical,
   Translation,
@@ -35,6 +40,70 @@ export class GridArea {
     this.location = location;
     this.dimensions = dimensions;
     this.areaId = areaId;
+  }
+
+  cornerLocation(corner: RectangleCorner): GridLocation {
+    const result = new GridLocation(this.row, this.column);
+
+    /* Corners on the right need our width added. */
+    if (isRight(corner)) {
+      result.column += this.width;
+    }
+
+    /* Corners on the bottom need our height added. */
+    if (isBottom(corner)) {
+      result.row += this.height;
+    }
+
+    return result;
+  }
+
+  get topLeft(): GridLocation {
+    return this.cornerLocation(RectangleCorner.topLeft);
+  }
+
+  get topRight(): GridLocation {
+    return this.cornerLocation(RectangleCorner.topRight);
+  }
+
+  get bottomLeft(): GridLocation {
+    return this.cornerLocation(RectangleCorner.bottomLeft);
+  }
+
+  get bottomRight(): GridLocation {
+    return this.cornerLocation(RectangleCorner.bottomRight);
+  }
+
+  inArea(location: GridLocation): boolean {
+    let result = location.row > this.row && location.column > this.column;
+
+    if (result) {
+      const bottomRight = this.bottomRight;
+      result =
+        location.row < bottomRight.row && location.column < bottomRight.column;
+    }
+
+    return result;
+  }
+
+  *corners(): Generator<GridLocation> {
+    yield this.topLeft;
+    yield this.topRight;
+    yield this.bottomRight;
+    yield this.bottomLeft;
+  }
+
+  *locations(): Generator<GridLocation> {
+    const result = new GridLocation();
+
+    const bottomRight = this.bottomRight;
+    for (let row = this.row; row <= bottomRight.row; row++) {
+      result.row = row;
+      for (let column = this.column; column <= bottomRight.column; column++) {
+        result.column = column;
+        yield result;
+      }
+    }
   }
 
   translate(
