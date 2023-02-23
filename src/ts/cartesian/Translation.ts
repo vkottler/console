@@ -7,6 +7,19 @@ export enum Translation {
   right,
 }
 
+export function flip(translation: Translation): Translation {
+  switch (translation) {
+    case Translation.up:
+      return Translation.down;
+    case Translation.down:
+      return Translation.up;
+    case Translation.left:
+      return Translation.right;
+    case Translation.right:
+      return Translation.left;
+  }
+}
+
 export function translationName(translation: Translation) {
   switch (translation) {
     case Translation.up:
