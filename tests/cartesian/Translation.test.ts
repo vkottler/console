@@ -6,6 +6,7 @@ import {
   RectangleCorner,
 } from "../../src/ts/cartesian/RectangleCorner";
 import {
+  flip,
   isHorizontal,
   isVertical,
   translate,
@@ -103,5 +104,8 @@ describe("Testing the 'Translation' module.", () => {
     expect(isRight(RectangleCorner.topRight)).toBe(true);
     expect(isRight(RectangleCorner.bottomLeft)).toBe(false);
     expect(isRight(RectangleCorner.bottomRight)).toBe(true);
+
+    expect(flip(Translation.down)).toBe(Translation.up);
+    expect(flip(Translation.right)).toBe(Translation.left);
   });
 });
