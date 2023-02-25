@@ -32,10 +32,10 @@ describe("Testing the 'App' module.", () => {
     ).toBe(true);
 
     /* Test keybinds. */
-    const codes = ["Enter"];
-    for (const code of codes) {
+    const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"];
+    for (const key of keys) {
       const options = {
-        code: code,
+        key: key,
         ctrlKey: false,
         shiftKey: false,
         altKey: false,
@@ -60,7 +60,7 @@ describe("Testing the 'App' module.", () => {
 
   test("Test keybinds.", () => {
     const bind = new Keybind("Enter", keybindCallback);
-    expect(bind.matches(new KeyboardEvent("keyup", { code: "Enter" }))).toBe(
+    expect(bind.matches(new KeyboardEvent("keyup", { key: "Enter" }))).toBe(
       true
     );
   });

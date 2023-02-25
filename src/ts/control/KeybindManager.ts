@@ -18,12 +18,12 @@ export class KeybindManager {
   }
 
   register(
-    code: string,
+    key: string,
     dispatch: KeybindCallback,
     mods?: Iterable<ModKeyFlag>,
     keydown = true
   ): boolean {
-    const bind = new Keybind(code, dispatch, mods);
+    const bind = new Keybind(key, dispatch, mods);
 
     let map = this.keyup;
     if (keydown) {
@@ -34,7 +34,7 @@ export class KeybindManager {
   }
 
   handle(event: KeyboardEvent, map: KeybindMap) {
-    const modsMap = map.get(event.code);
+    const modsMap = map.get(event.key);
 
     if (modsMap != undefined) {
       const modvalue = modKeyValue(event);

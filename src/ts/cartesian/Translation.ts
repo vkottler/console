@@ -20,6 +20,19 @@ export function flip(translation: Translation): Translation {
   }
 }
 
+export function eventDirection(event: KeyboardEvent): Translation | undefined {
+  switch (event.key) {
+    case "ArrowLeft":
+      return Translation.left;
+    case "ArrowRight":
+      return Translation.right;
+    case "ArrowUp":
+      return Translation.up;
+    case "ArrowDown":
+      return Translation.down;
+  }
+}
+
 export function translationName(translation: Translation) {
   switch (translation) {
     case Translation.up:
