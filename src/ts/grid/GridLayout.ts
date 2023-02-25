@@ -202,5 +202,6 @@ export class GridLayout {
       }
     }
     element.style.gridTemplateAreas = areas;
+    element.style.display = "grid";
   }
 }

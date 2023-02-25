@@ -16,18 +16,11 @@ export abstract class App {
 
     this.keybinds = new KeybindManager();
 
-    this.registerEvents();
-    this.init();
+    window.onresize = this.pollDimensions.bind(this);
     this.pollDimensions();
   }
 
-  abstract init(): void | undefined;
-
   abstract dispatch(): void | undefined;
-
-  registerEvents() {
-    window.onresize = this.pollDimensions.bind(this);
-  }
 
   dimensionsUpdate(width: number, height: number) {
     console.log(`new width:  ${width}`);

@@ -28,16 +28,16 @@ export type KeybindMap = Map<string, Map<number, Keybind>>;
 export type KeybindCallback = (event: KeyboardEvent) => boolean;
 
 export class Keybind {
-  code: string;
+  key: string;
   requiredMods: number;
   dispatch: KeybindCallback;
 
   constructor(
-    code: string,
+    key: string,
     dispatch: KeybindCallback,
     mods?: Iterable<ModKeyFlag>
   ) {
-    this.code = code;
+    this.key = key;
     this.dispatch = dispatch;
     this.requiredMods = 0;
 
@@ -49,7 +49,7 @@ export class Keybind {
   }
 
   matches(event: KeyboardEvent): boolean {
-    return this.matchesMods(event) && event.code == this.code;
+    return this.matchesMods(event) && event.key == this.key;
   }
 
   matchesMods(event: KeyboardEvent): boolean {
@@ -57,11 +57,11 @@ export class Keybind {
   }
 
   register(map: KeybindMap): boolean {
-    if (!map.has(this.code)) {
-      map.set(this.code, new Map<number, Keybind>());
+    if (!map.has(this.key)) {
+      map.set(this.key, new Map<number, Keybind>());
     }
 
-    const modsMap = map.get(this.code);
+    const modsMap = map.get(this.key);
 
     if (modsMap != undefined && !modsMap.has(this.requiredMods)) {
       modsMap.set(this.requiredMods, this);
