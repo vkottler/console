@@ -8,4 +8,5 @@ module.exports = {
     "simple-import-sort/exports": "error",
     "@typescript-eslint/naming-convention": "warn"
   },
+  parserOptions: {project: "tsconfig.json"}
 };

@@ -7,5 +7,6 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "target": "es6"
-  }
+  },
+  "include": ["./tests/**/*.ts", "./src/**/*.ts"]
 }

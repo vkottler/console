@@ -31,8 +31,8 @@ export abstract class App {
     this.app.style.height = "100%";
 
     this.registerEvents();
-    this.init();
     this.pollDimensions();
+    this.init();
   }
 
   abstract init(): void | undefined;
