@@ -1,7 +1,10 @@
-export class App {
+import { KeybindManager } from "./control/KeybindManager";
+
+export abstract class App {
   app: HTMLElement;
   width: number;
   height: number;
+  keybinds: KeybindManager;
 
   constructor(root: Element) {
     this.width = 0;
@@ -11,19 +14,19 @@ export class App {
     root.appendChild(this.app);
     this.app.style.height = "100%";
 
+    this.keybinds = new KeybindManager();
+
     this.registerEvents();
+    this.init();
     this.pollDimensions();
   }
 
-  dispatch() {
-    return;
-  }
+  abstract init(): void | undefined;
+
+  abstract dispatch(): void | undefined;
 
   registerEvents() {
     window.onresize = this.pollDimensions.bind(this);
-
-    document.addEventListener("keydown", this.handleKeydown.bind(this));
-    document.addEventListener("keyup", this.handleKeyup.bind(this));
   }
 
   dimensionsUpdate(width: number, height: number) {
@@ -40,13 +43,5 @@ export class App {
       this.height = this.app.clientHeight;
       this.dimensionsUpdate(this.width, this.height);
     }
-  }
-
-  handleKeyup(event: KeyboardEvent) {
-    console.log(event);
-  }
-
-  handleKeydown(event: KeyboardEvent) {
-    console.log(event);
   }
 }

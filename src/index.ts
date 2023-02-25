@@ -1,4 +1,4 @@
-import { App } from "./ts/App";
+import { SampleApp } from "./ts/apps/GridTesting";
 
 const APP_PERIOD_MS = 100;
 
@@ -6,7 +6,7 @@ const APP_PERIOD_MS = 100;
  * Application entry-point.
  */
 function init(rootElem: Element) {
-  const app = new App(rootElem);
+  const app = new SampleApp(rootElem);
   setInterval(app.dispatch.bind(app), APP_PERIOD_MS);
 }
 
