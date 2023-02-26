@@ -1,7 +1,13 @@
-import { eventDirection } from "../cartesian/Translation";
+import { eventDirection, translationName } from "../cartesian/Translation";
 import { GridDimensions } from "./GridDimensions";
 import { GridLayout } from "./GridLayout";
 import { GridLocation } from "./GridLocation";
+
+export const GRID_RESIZE = "gridResize";
+export const ERROR_MESSAGE = "errorMessage";
+
+type GridResizeHandler = (event: CustomEvent<GridDimensions>) => void;
+type GridErrorHandler = (event: CustomEvent<string>) => void;
 
 export class GridLayoutManager {
   container: HTMLElement;
@@ -43,13 +49,47 @@ export class GridLayoutManager {
     }
   }
 
+  #fireGridResize() {
+    this.container.dispatchEvent(
+      new CustomEvent<GridDimensions>(GRID_RESIZE, {
+        detail: this.layout.dimensions,
+      })
+    );
+  }
+
+  registerResizeHandler(handler: GridResizeHandler) {
+    this.container.addEventListener(GRID_RESIZE, handler as EventListener);
+
+    /* Give the handler a chance to set some initial state. */
+    this.#fireGridResize();
+  }
+
+  #fireErrorMessage(message: string) {
+    this.container.dispatchEvent(
+      new CustomEvent<string>(ERROR_MESSAGE, { detail: message })
+    );
+  }
+
+  registerErrorHandler(handler: GridErrorHandler) {
+    this.container.addEventListener(ERROR_MESSAGE, handler as EventListener);
+  }
+
   resizeHandler(event: KeyboardEvent, isExpand: boolean): boolean {
     const direction = eventDirection(event);
     if (direction != undefined) {
       if (isExpand) {
-        this.layout.expand(direction, this.container);
+        /* Expanding the grid can't fail currently. */
+        if (this.layout.expand(direction, this.container)) {
+          this.#fireGridResize();
+        }
       } else {
-        this.layout.contract(direction, this.container);
+        if (this.layout.contract(direction, this.container)) {
+          this.#fireGridResize();
+        } else {
+          this.#fireErrorMessage(
+            `Couldn't contract grid ${translationName(direction)}.`
+          );
+        }
       }
     }
     return direction != undefined;
