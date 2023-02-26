@@ -79,6 +79,12 @@ describe("Testing the 'GridArea' module.", () => {
 
     expect(area.contract(Translation.left)).toBe(false);
     expect(area.contract(Translation.up)).toBe(false);
+
+    expect(area.expand(Translation.right)).toBe(true);
+    expect(area.expand(Translation.down)).toBe(true);
+
+    expect(area.contract(Translation.left)).toBe(true);
+    expect(area.contract(Translation.up)).toBe(true);
   });
 
   test("Locations being inside grid areas.", () => {

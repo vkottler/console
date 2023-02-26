@@ -21,14 +21,18 @@ function areaName(areaId: number): string {
   return "area-" + areaId.toString();
 }
 
+export type AreaUpdateHandler = (area: GridArea) => void;
+
 export class GridArea {
   location: GridLocation;
   dimensions: GridDimensions;
   areaId: number;
+  handler: AreaUpdateHandler | undefined;
 
   constructor(
     location?: GridLocation,
     dimensions?: GridDimensions,
+    handler?: AreaUpdateHandler,
     areaId = INIT_ID
   ) {
     if (location == undefined) {
@@ -39,7 +43,14 @@ export class GridArea {
     }
     this.location = location;
     this.dimensions = dimensions;
+    this.handler = handler;
     this.areaId = areaId;
+  }
+
+  #signalHandler() {
+    if (this.handler != undefined) {
+      this.handler(this);
+    }
   }
 
   cornerLocation(corner: RectangleCorner): GridLocation {
@@ -111,7 +122,16 @@ export class GridArea {
     bounds?: GridDimensions,
     update = true
   ): GridLocation | undefined {
-    return this.location.translate(direction, bounds, this.dimensions, update);
+    const result = this.location.translate(
+      direction,
+      bounds,
+      this.dimensions,
+      update
+    );
+    if (result != undefined) {
+      this.#signalHandler();
+    }
+    return result;
   }
 
   contract(direction: Translation, update = true): boolean {
@@ -141,7 +161,10 @@ export class GridArea {
      */
     if (direction == Translation.right || direction == Translation.down) {
       assert(this.translate(direction, undefined, update) != undefined);
+    } else {
+      this.#signalHandler();
     }
+
     return true;
   }
 
@@ -190,6 +213,7 @@ export class GridArea {
       if (isHorizontal(direction)) {
         this.dimensions.columns++;
       }
+      this.#signalHandler();
     }
 
     return result;

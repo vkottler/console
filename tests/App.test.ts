@@ -32,7 +32,18 @@ describe("Testing the 'App' module.", () => {
     ).toBe(true);
 
     /* Test keybinds. */
-    const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"];
+    const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+
+    for (const key of keys) {
+      app.keybinds.handleKeydown(new KeyboardEvent("keydown", { key: key }));
+    }
+    for (const key of keys) {
+      app.keybinds.handleKeydown(
+        new KeyboardEvent("keydown", { key: key, ctrlKey: true })
+      );
+    }
+
+    keys.push("Enter");
     for (const key of keys) {
       const options = {
         key: key,
