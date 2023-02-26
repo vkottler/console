@@ -1,4 +1,7 @@
-import { Translation } from "../../src/ts/cartesian/Translation";
+import {
+  allTranslations,
+  Translation,
+} from "../../src/ts/cartesian/Translation";
 import { GridLayout } from "../../src/ts/grid/GridLayout";
 import { GridLocation } from "../../src/ts/grid/GridLocation";
 
@@ -41,5 +44,62 @@ describe("Testing the 'GridLayout' module.", () => {
     expect(area.column).toBe(1);
     expect(layout.width).toBe(3);
     expect(layout.height).toBe(3);
+  });
+
+  test("GridArea contracting.", () => {
+    const layout = new GridLayout();
+    const layoutContainer = document.createElement("div");
+
+    /* We shouldn't be able to contract in any direction. */
+    for (const translation of allTranslations()) {
+      expect(layout.contract(translation)).toBe(false);
+    }
+
+    /* Expand and contract. */
+    expect(layout.expand(Translation.right, layoutContainer)).toBe(true);
+    expect(layout.contract(Translation.left, layoutContainer)).toBe(true);
+
+    /* Expand and contract. */
+    expect(layout.expand(Translation.right, layoutContainer)).toBe(true);
+    expect(layout.contract(Translation.right, layoutContainer)).toBe(true);
+
+    /* Ensure we're back to initial conditions. */
+    expect(layout.width).toBe(1);
+    expect(layout.height).toBe(1);
+
+    /* Add an initial area. */
+    const area = layout.createArea();
+    expect(layout.validArea(area)).toBe(true);
+    expect(layout.validArea(area, true)).toBe(true);
+    expect(layout.validArea(area)).toBe(true);
+
+    /* Expand in every direction. */
+    for (const translation of allTranslations()) {
+      expect(layout.expand(translation, layoutContainer)).toBe(true);
+    }
+    expect(area.row).toBe(1);
+    expect(area.column).toBe(1);
+
+    /* Contract right. Removes the first column. */
+    expect(layout.contract(Translation.right, layoutContainer)).toBe(true);
+    expect(area.column).toBe(0);
+
+    /* Expand left again. */
+    expect(layout.expand(Translation.left)).toBe(true);
+    expect(area.column).toBe(1);
+    expect(layout.width).toBe(3);
+
+    /* Contract left. Removes the last column. */
+    expect(layout.contract(Translation.left, layoutContainer)).toBe(true);
+    expect(area.column).toBe(1);
+    expect(layout.contract(Translation.left, layoutContainer)).toBe(false);
+
+    /* Contract down. Removes the first row. */
+    expect(layout.contract(Translation.down, layoutContainer)).toBe(true);
+    expect(area.row).toBe(0);
+    expect(layout.contract(Translation.down, layoutContainer)).toBe(false);
+
+    /* Contract up. */
+    expect(layout.contract(Translation.up, layoutContainer)).toBe(true);
   });
 });

@@ -8,9 +8,14 @@ import {
 } from "../cartesian/Translation";
 import { GridArea, INIT_ID } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
+import {
+  apply,
+  EMPTY,
+  isColumnEmpty,
+  isRowEmpty,
+  validArea,
+} from "./GridLayoutInterface";
 import { GridLocation } from "./GridLocation";
-
-const EMPTY = ".";
 
 function newRow(columns: number): string[] {
   const newRow = [];
@@ -42,53 +47,11 @@ export class GridLayout {
   }
 
   validLocation(location: GridLocation, dimensions?: GridDimensions): boolean {
-    let result = location.row >= 0 && location.row < this.dimensions.rows;
-    result &&=
-      location.column >= 0 && location.column < this.dimensions.columns;
-
-    if (result && dimensions != undefined) {
-      result = location.row + dimensions.height <= this.dimensions.rows;
-      result &&= location.column + dimensions.width <= this.dimensions.columns;
-    }
-
-    return result;
+    return location.inBounds(this.dimensions, dimensions);
   }
 
   validArea(area: GridArea, assign = false): boolean {
-    const name = area.name;
-
-    if (this.validLocation(area.location, area.dimensions)) {
-      for (let row = area.row; row < area.row + area.height; row++) {
-        for (
-          let column = area.column;
-          column < area.column + area.width;
-          column++
-        ) {
-          const cell = this.cells[row][column];
-          if (cell != name && cell != EMPTY) {
-            return false;
-          }
-        }
-      }
-    }
-
-    /*
-     * Update cells if this are was valid and we should assign it to this
-     * position.
-     */
-    if (assign) {
-      for (let row = area.row; row < area.row + area.height; row++) {
-        for (
-          let column = area.column;
-          column < area.column + area.width;
-          column++
-        ) {
-          this.cells[row][column] = name;
-        }
-      }
-    }
-
-    return true;
+    return validArea(this, area, assign);
   }
 
   #getNextAreaId(): number {
@@ -107,9 +70,30 @@ export class GridLayout {
     }
   }
 
-  *areas(): Generator<GridArea> {
+  *areas(
+    minRow = 0,
+    minColumn = 0,
+    maxRow = -1,
+    maxColumn = -1
+  ): Generator<GridArea> {
+    if (maxRow == -1) {
+      maxRow = this.height;
+    }
+
+    if (maxColumn == -1) {
+      maxColumn = this.width;
+    }
+
     for (const area of this.byId.values()) {
-      yield area;
+      const bottomRight = area.bottomRight;
+      if (
+        area.row >= minRow &&
+        area.column >= minColumn &&
+        bottomRight.row <= maxRow &&
+        bottomRight.column <= maxColumn
+      ) {
+        yield area;
+      }
     }
   }
 
@@ -122,6 +106,90 @@ export class GridLayout {
     assert(this.validLocation(area.location));
     this.assignId(area, element);
     return area;
+  }
+
+  /**
+   * Determine if a row is empty.
+   */
+  #removeEmptyRow(row: number): boolean {
+    let result = isRowEmpty(this, row);
+
+    /* Don't remove the only row. */
+    result &&= this.dimensions.rows > 1;
+
+    if (result) {
+      this.cells.splice(row, 1);
+      this.dimensions.rows -= 1;
+
+      /*
+       * Update area locations for any area beyond the removed row. These
+       * areas need 1 subtracted to their row coordinate because the overall
+       * grid has shrunk.
+       */
+      for (const area of this.areas(row)) {
+        area.location.row--;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Determine if a column is empty.
+   */
+  #removeEmptyColumn(column: number): boolean {
+    let result = isColumnEmpty(this, column);
+
+    /* Don't remove the only column. */
+    result &&= this.dimensions.columns > 1;
+
+    if (result) {
+      /* Remove an element in the underlying grid cells. */
+      for (let row = 0; row < this.dimensions.rows; row++) {
+        this.cells[row].splice(column, 1);
+      }
+      this.dimensions.columns -= 1;
+
+      /*
+       * Update area locations for any area beyond the removed column. These
+       * areas need 1 subtracted to their column coordinate because the overall
+       * grid has shrunk.
+       */
+      for (const area of this.areas(0, column)) {
+        area.location.column--;
+      }
+    }
+
+    return result;
+  }
+
+  contract(direction: Translation, element?: HTMLElement): boolean {
+    let result = false;
+
+    switch (direction) {
+      /* Attempt to remove the bottom row. */
+      case Translation.up:
+        result = this.#removeEmptyRow(this.dimensions.rows - 1);
+        break;
+      /* Attempt to remove the top row. */
+      case Translation.down:
+        result = this.#removeEmptyRow(0);
+        break;
+      /* Attempt to remove the furthest-right column. */
+      case Translation.left:
+        result = this.#removeEmptyColumn(this.dimensions.columns - 1);
+        break;
+      /* Attempt to remove the furthest-left column. */
+      case Translation.right:
+        result = this.#removeEmptyColumn(0);
+        break;
+    }
+
+    if (result && element != undefined) {
+      this.apply(element);
+    }
+
+    return result;
   }
 
   expand(direction: Translation, element?: HTMLElement): boolean {
@@ -145,10 +213,10 @@ export class GridLayout {
     }
 
     if (isVertical(direction)) {
-      this.dimensions.rows += 1;
+      this.dimensions.rows++;
     }
     if (isHorizontal(direction)) {
-      this.dimensions.columns += 1;
+      this.dimensions.columns++;
     }
 
     /*
@@ -171,37 +239,6 @@ export class GridLayout {
   }
 
   apply(element: HTMLElement) {
-    /*
-     * Update the container's grid-template rows.
-     */
-    let line = [];
-    for (let row = 0; row < this.dimensions.rows; row++) {
-      line.push("auto");
-    }
-
-    /*
-     * Update the container's grid-template columns.
-     */
-    line = [];
-    for (let column = 0; column < this.dimensions.columns; column++) {
-      line.push("auto");
-    }
-
-    /*
-     * Update the container's grid-template areas;
-     */
-    let areas = "";
-    for (let row = 0; row < this.dimensions.rows; row++) {
-      line = [];
-      for (let column = 0; column < this.dimensions.columns; column++) {
-        line.push(this.cells[row][column]);
-      }
-      areas += '"' + line.join(" ") + '"';
-      if (row < this.dimensions.rows - 1) {
-        areas += "\n";
-      }
-    }
-    element.style.gridTemplateAreas = areas;
-    element.style.display = "grid";
+    apply(this, element);
   }
 }
