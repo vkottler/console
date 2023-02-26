@@ -1,18 +1,22 @@
 import { eventDirection, translationName } from "../cartesian/Translation";
+import { AreaUpdateHandler, GridArea } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
 import { GridLayout } from "./GridLayout";
 import { GridLocation } from "./GridLocation";
 
-export const GRID_RESIZE = "gridResize";
-export const ERROR_MESSAGE = "errorMessage";
+const GRID_RESIZE = "gridResize";
+const ERROR_MESSAGE = "errorMessage";
+const GRID_AREA_UPDATE = "gridAreaUpdate";
 
 type GridResizeHandler = (event: CustomEvent<GridDimensions>) => void;
 type GridErrorHandler = (event: CustomEvent<string>) => void;
+type GridAreaUpdateHandler = (event: CustomEvent<GridArea>) => void;
 
 export class GridLayoutManager {
   container: HTMLElement;
   layout: GridLayout;
   elements: Map<number, HTMLElement>;
+  areaUpdateHandler: AreaUpdateHandler;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -24,19 +28,35 @@ export class GridLayoutManager {
 
     this.layout = new GridLayout();
     this.elements = new Map<number, HTMLElement>();
+    this.areaUpdateHandler = this.#handleAreaUpdate.bind(this);
 
     /* Apply the initial, empty layout. */
     this.layout.apply(this.container);
   }
 
+  #handleAreaUpdate(area: GridArea) {
+    const element = this.elements.get(area.areaId);
+    if (element != undefined) {
+      element.dispatchEvent(
+        new CustomEvent<GridArea>(GRID_AREA_UPDATE, { detail: area })
+      );
+    }
+  }
+
   createArea(
     location?: GridLocation,
     dimensions?: GridDimensions,
+    handler?: GridAreaUpdateHandler,
     kind = "div"
   ): HTMLElement | undefined {
     const element = document.createElement(kind);
 
-    const area = this.layout.createArea(element, location, dimensions);
+    const area = this.layout.createArea(
+      element,
+      location,
+      dimensions,
+      this.areaUpdateHandler
+    );
 
     if (this.layout.validArea(area, true)) {
       this.elements.set(area.areaId, element);
@@ -44,6 +64,14 @@ export class GridLayoutManager {
       /* Ensure the layout change gets applied. */
       this.container.appendChild(element);
       this.layout.apply(this.container);
+
+      /* Register a handler if it was provided. */
+      if (handler != undefined) {
+        element.addEventListener(GRID_AREA_UPDATE, handler as EventListener);
+      }
+
+      /* Fire the update event manually. */
+      this.#handleAreaUpdate(area);
 
       return element;
     }

@@ -6,7 +6,7 @@ import {
   isVertical,
   Translation,
 } from "../cartesian/Translation";
-import { GridArea, INIT_ID } from "./GridArea";
+import { AreaUpdateHandler, GridArea, INIT_ID } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
 import {
   apply,
@@ -100,9 +100,10 @@ export class GridLayout {
   createArea(
     element?: HTMLElement,
     location?: GridLocation,
-    dimensions?: GridDimensions
+    dimensions?: GridDimensions,
+    handler?: AreaUpdateHandler
   ): GridArea {
-    const area = new GridArea(location, dimensions);
+    const area = new GridArea(location, dimensions, handler);
     assert(this.validLocation(area.location));
     this.assignId(area, element);
     return area;
@@ -118,17 +119,17 @@ export class GridLayout {
     result &&= this.dimensions.rows > 1;
 
     if (result) {
-      this.cells.splice(row, 1);
-      this.dimensions.rows -= 1;
-
       /*
        * Update area locations for any area beyond the removed row. These
        * areas need 1 subtracted to their row coordinate because the overall
        * grid has shrunk.
        */
       for (const area of this.areas(row)) {
-        area.location.row--;
+        assert(area.translate(Translation.up));
       }
+
+      this.cells.splice(row, 1);
+      this.dimensions.rows -= 1;
     }
 
     return result;
@@ -144,20 +145,20 @@ export class GridLayout {
     result &&= this.dimensions.columns > 1;
 
     if (result) {
-      /* Remove an element in the underlying grid cells. */
-      for (let row = 0; row < this.dimensions.rows; row++) {
-        this.cells[row].splice(column, 1);
-      }
-      this.dimensions.columns -= 1;
-
       /*
        * Update area locations for any area beyond the removed column. These
        * areas need 1 subtracted to their column coordinate because the overall
        * grid has shrunk.
        */
       for (const area of this.areas(0, column)) {
-        area.location.column--;
+        assert(area.translate(Translation.left));
       }
+
+      /* Remove an element in the underlying grid cells. */
+      for (let row = 0; row < this.dimensions.rows; row++) {
+        this.cells[row].splice(column, 1);
+      }
+      this.dimensions.columns -= 1;
     }
 
     return result;

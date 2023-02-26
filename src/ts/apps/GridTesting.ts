@@ -2,6 +2,7 @@ import assert from "assert";
 
 import { App } from "../App";
 import { ModKeyFlag } from "../control/Keybind";
+import { GridArea } from "../grid/GridArea";
 import { GridDimensions } from "../grid/GridDimensions";
 import { GridLayoutManager } from "../grid/GridLayoutManager";
 
@@ -12,7 +13,24 @@ export class SampleApp extends App {
     super(root);
     this.layout = new GridLayoutManager(this.app);
 
-    const initialElem = this.layout.createArea();
+    const gridUpdate = document.createElement("div");
+
+    /* Handle updates to the initial element. */
+    const initialElem = this.layout.createArea(
+      undefined,
+      undefined,
+      (event: CustomEvent<GridArea>) => {
+        const area = event.detail;
+
+        const parts = [];
+        parts.push(`row: ${area.row}`);
+        parts.push(`column: ${area.column}`);
+        parts.push(`width: ${area.width}`);
+        parts.push(`height: ${area.width}`);
+
+        gridUpdate.innerHTML = parts.join(", ");
+      }
+    );
     assert(initialElem != undefined);
     initialElem.style.backgroundColor = "orange";
 
@@ -20,6 +38,7 @@ export class SampleApp extends App {
     const errorElem = document.createElement("div");
     initialElem.appendChild(statusElem);
     initialElem.appendChild(errorElem);
+    initialElem.appendChild(gridUpdate);
 
     /* Arrow keys can expand and contract the grid. */
     const expand = this.layout.expandHandler.bind(this.layout);
