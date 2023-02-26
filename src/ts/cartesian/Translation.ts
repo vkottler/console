@@ -7,6 +7,13 @@ export enum Translation {
   right,
 }
 
+export function* allTranslations(): Generator<Translation> {
+  yield Translation.up;
+  yield Translation.down;
+  yield Translation.left;
+  yield Translation.right;
+}
+
 export function flip(translation: Translation): Translation {
   switch (translation) {
     case Translation.up:
