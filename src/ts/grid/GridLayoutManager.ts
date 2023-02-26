@@ -43,11 +43,23 @@ export class GridLayoutManager {
     }
   }
 
-  expandHandler(event: KeyboardEvent): boolean {
+  resizeHandler(event: KeyboardEvent, isExpand: boolean): boolean {
     const direction = eventDirection(event);
     if (direction != undefined) {
-      this.layout.expand(direction, this.container);
+      if (isExpand) {
+        this.layout.expand(direction, this.container);
+      } else {
+        this.layout.contract(direction, this.container);
+      }
     }
     return direction != undefined;
+  }
+
+  expandHandler(event: KeyboardEvent): boolean {
+    return this.resizeHandler(event, true);
+  }
+
+  contractHandler(event: KeyboardEvent): boolean {
+    return this.resizeHandler(event, false);
   }
 }

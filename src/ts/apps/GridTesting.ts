@@ -1,6 +1,7 @@
 import assert from "assert";
 
 import { App } from "../App";
+import { ModKeyFlag } from "../control/Keybind";
 import { GridLayoutManager } from "../grid/GridLayoutManager";
 
 export class SampleApp extends App {
@@ -16,9 +17,12 @@ export class SampleApp extends App {
     initialElem.innerHTML = "Hello, world!";
     initialElem.style.backgroundColor = "orange";
 
-    const handler = this.layout.expandHandler.bind(this.layout);
+    /* Arrow keys can expand and contract the grid. */
+    const expand = this.layout.expandHandler.bind(this.layout);
+    const contract = this.layout.contractHandler.bind(this.layout);
     for (const key of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]) {
-      this.keybinds.register(key, handler);
+      this.keybinds.register(key, expand);
+      this.keybinds.register(key, contract, [ModKeyFlag.ctrlKey]);
     }
   }
 
