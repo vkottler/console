@@ -14,4 +14,8 @@ export class GridDimensions {
   get height(): number {
     return this.rows;
   }
+
+  get square(): boolean {
+    return this.rows == this.columns;
+  }
 }

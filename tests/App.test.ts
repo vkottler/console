@@ -10,6 +10,9 @@ describe("Testing the 'App' module.", () => {
   test("Basic application setup.", () => {
     const app = new SampleApp(document.body);
 
+    /* We shouldn't be able to create another area. */
+    expect(app.layout.createArea()).toBe(undefined);
+
     /*
      * Mock the application element's dimensions.
      */
@@ -34,12 +37,56 @@ describe("Testing the 'App' module.", () => {
     /* Test keybinds. */
     const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
 
+    /* Expand grid in all directions. */
     for (const key of keys) {
       app.keybinds.handleKeydown(new KeyboardEvent("keydown", { key: key }));
     }
+
+    /* Contract grid in all directions. */
     for (const key of keys) {
       app.keybinds.handleKeydown(
         new KeyboardEvent("keydown", { key: key, ctrlKey: true })
+      );
+      app.keybinds.handleKeydown(
+        new KeyboardEvent("keydown", { key: key, ctrlKey: true })
+      );
+    }
+
+    /* Expand grid in all directions. */
+    for (const key of keys) {
+      app.keybinds.handleKeydown(new KeyboardEvent("keydown", { key: key }));
+    }
+
+    /* Expand cursor in all directions. */
+    for (const key of keys) {
+      app.keybinds.handleKeydown(
+        new KeyboardEvent("keydown", { key: key, shiftKey: true })
+      );
+      app.keybinds.handleKeydown(
+        new KeyboardEvent("keydown", { key: key, shiftKey: true })
+      );
+    }
+
+    /* Expand grid in all directions twice. */
+    for (const key of keys) {
+      app.keybinds.handleKeydown(new KeyboardEvent("keydown", { key: key }));
+      app.keybinds.handleKeydown(new KeyboardEvent("keydown", { key: key }));
+    }
+
+    /* Expand cursor in all directions. */
+    for (const key of keys) {
+      app.keybinds.handleKeydown(
+        new KeyboardEvent("keydown", { key: key, shiftKey: true })
+      );
+    }
+
+    /* Contract cursor in all directions. */
+    for (const key of keys) {
+      app.keybinds.handleKeydown(
+        new KeyboardEvent("keydown", { key: key, altKey: true })
+      );
+      app.keybinds.handleKeydown(
+        new KeyboardEvent("keydown", { key: key, altKey: true })
       );
     }
 

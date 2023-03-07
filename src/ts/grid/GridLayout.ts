@@ -25,17 +25,31 @@ function newRow(columns: number): string[] {
   return newRow;
 }
 
+type CursorUpdateHandler = (prevCursor: number, currCursor: number) => void;
+
 export class GridLayout {
   dimensions: GridDimensions;
   cells: string[][];
   nextAreaId: number;
   byId: Map<number, GridArea>;
+  cursor: number;
+  cursorHandler: CursorUpdateHandler | undefined;
 
-  constructor() {
+  constructor(cursorHandler?: CursorUpdateHandler) {
     this.dimensions = new GridDimensions();
     this.cells = [[EMPTY]];
     this.nextAreaId = 0;
     this.byId = new Map<number, GridArea>();
+    this.cursor = INIT_ID;
+    this.cursorHandler = cursorHandler;
+  }
+
+  get cursorArea(): GridArea | undefined {
+    if (this.cursor != INIT_ID) {
+      const result = this.byId.get(this.cursor);
+      assert(result != undefined);
+      return result;
+    }
   }
 
   get width(): number {
@@ -46,12 +60,34 @@ export class GridLayout {
     return this.dimensions.height;
   }
 
+  get isNormal(): boolean {
+    return this.width == 1 && this.height == 1;
+  }
+
   validLocation(location: GridLocation, dimensions?: GridDimensions): boolean {
     return location.inBounds(this.dimensions, dimensions);
   }
 
+  #updateCursor(value: number) {
+    const prev = this.cursor;
+    this.cursor = value;
+    if (this.cursorHandler != undefined) {
+      this.cursorHandler(prev, this.cursor);
+    }
+  }
+
   validArea(area: GridArea, assign = false): boolean {
-    return validArea(this, area, assign);
+    const result = validArea(this, area, assign);
+
+    /*
+     * Initialize the cursor if this area is valid and being assigned to the
+     * grid.
+     */
+    if (result && assign && this.cursor == INIT_ID) {
+      this.#updateCursor(area.areaId);
+    }
+
+    return result;
   }
 
   #getNextAreaId(): number {
@@ -164,7 +200,11 @@ export class GridLayout {
     return result;
   }
 
-  contract(direction: Translation, element?: HTMLElement): boolean {
+  contract(
+    direction: Translation,
+    element?: HTMLElement,
+    normalize = true
+  ): boolean {
     let result = false;
 
     switch (direction) {
@@ -186,8 +226,123 @@ export class GridLayout {
         break;
     }
 
+    if (result) {
+      /*
+       * Check if this contraction caused the grid and cursor element to be
+       * the same size.
+       */
+      if (normalize) {
+        const area = this.cursorArea;
+        if (area != undefined) {
+          this.#normalize(area, element);
+        }
+      }
+
+      if (element != undefined) {
+        this.apply(element);
+      }
+    }
+
+    return result;
+  }
+
+  #clearAreaCells(area: GridArea) {
+    const name = area.name;
+    for (let row = 0; row < area.height; row++) {
+      for (let column = 0; column < area.width; column++) {
+        const rowIdx = area.row + row;
+        const columnIdx = area.column + column;
+        assert(this.cells[rowIdx][columnIdx] == name);
+        this.cells[rowIdx][columnIdx] = EMPTY;
+      }
+    }
+  }
+
+  contractArea(
+    area: GridArea,
+    direction: Translation,
+    element?: HTMLElement
+  ): boolean {
+    /* Clear cells this area is occupying. */
+    this.#clearAreaCells(area);
+
+    /* Attempt contracting. */
+    const result = area.contract(direction);
+
+    /*
+     * Regardless of successfully contracting, ensure this area occupy's the
+     * correct gird cells.
+     */
+    assert(this.validArea(area, true));
+
     if (result && element != undefined) {
       this.apply(element);
+    }
+
+    return result;
+  }
+
+  contractCursorArea(direction: Translation, element?: HTMLElement): boolean {
+    let result = false;
+    const area = this.cursorArea;
+
+    if (area != undefined) {
+      result = this.contractArea(area, direction, element);
+    }
+
+    return result;
+  }
+
+  #normalize(auditArea: GridArea, element?: HTMLElement) {
+    if (
+      auditArea.width == this.dimensions.width &&
+      auditArea.height == this.dimensions.height
+    ) {
+      /* Contract width. */
+      let contractIterations = this.dimensions.width - 1;
+      for (let idx = 0; idx < contractIterations; idx++) {
+        assert(this.contractArea(auditArea, Translation.left, element));
+        assert(this.contract(Translation.left, element, false));
+      }
+
+      /* Contract height. */
+      contractIterations = this.dimensions.height - 1;
+      for (let idx = 0; idx < contractIterations; idx++) {
+        assert(this.contractArea(auditArea, Translation.up, element));
+        assert(this.contract(Translation.up, element, false));
+      }
+    }
+  }
+
+  expandArea(
+    area: GridArea,
+    direction: Translation,
+    element?: HTMLElement
+  ): boolean {
+    const result = area.expand(direction, this.dimensions);
+
+    if (result) {
+      assert(this.validArea(area, true));
+      if (element != undefined) {
+        this.apply(element);
+      }
+
+      /*
+       * If the area and grid have the same dimensions, we can re-size both
+       * to have height and width 1.
+       */
+      this.#normalize(area, element);
+    }
+
+    return result;
+  }
+
+  expandCursorArea(direction: Translation, element?: HTMLElement): boolean {
+    let result = false;
+    const area = this.cursorArea;
+
+    if (area != undefined) {
+      result = this.expandArea(area, direction, element);
     }
 
     return result;

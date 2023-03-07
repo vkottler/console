@@ -6,6 +6,7 @@ import { GridLocation } from "../../src/ts/grid/GridLocation";
 describe("Testing the 'GridArea' module.", () => {
   test("Basic interactions with grid areas", () => {
     const area = new GridArea();
+    expect(area.dimensions.square).toBe(true);
     area.areaId = 0;
     expect(area.name).toBe("area-0");
 

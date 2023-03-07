@@ -4,14 +4,20 @@ import { App } from "../App";
 import { ModKeyFlag } from "../control/Keybind";
 import { GridArea } from "../grid/GridArea";
 import { GridDimensions } from "../grid/GridDimensions";
-import { GridLayoutManager } from "../grid/GridLayoutManager";
+import { CursorUpdate, GridLayoutManager } from "../grid/GridLayoutManager";
 
 export class SampleApp extends App {
   layout: GridLayoutManager;
 
   constructor(root: Element) {
     super(root);
-    this.layout = new GridLayoutManager(this.app);
+
+    this.layout = new GridLayoutManager(
+      this.app,
+      ((event: CustomEvent<CursorUpdate>) => {
+        console.log(event);
+      }).bind(this)
+    );
 
     const gridUpdate = document.createElement("div");
 
@@ -25,8 +31,8 @@ export class SampleApp extends App {
         const parts = [];
         parts.push(`row: ${area.row}`);
         parts.push(`column: ${area.column}`);
+        parts.push(`height: ${area.height}`);
         parts.push(`width: ${area.width}`);
-        parts.push(`height: ${area.width}`);
 
         gridUpdate.innerHTML = parts.join(", ");
       }
@@ -43,9 +49,15 @@ export class SampleApp extends App {
     /* Arrow keys can expand and contract the grid. */
     const expand = this.layout.expandHandler.bind(this.layout);
     const contract = this.layout.contractHandler.bind(this.layout);
+    const expandArea = this.layout.expandCursorAreaHandler.bind(this.layout);
+    const contractArea = this.layout.contractCursorAreaHandler.bind(
+      this.layout
+    );
     for (const key of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]) {
       this.keybinds.register(key, expand);
       this.keybinds.register(key, contract, [ModKeyFlag.ctrlKey]);
+      this.keybinds.register(key, expandArea, [ModKeyFlag.shiftKey]);
+      this.keybinds.register(key, contractArea, [ModKeyFlag.altKey]);
     }
 
     /* Basic resize handler: show info about size. */
