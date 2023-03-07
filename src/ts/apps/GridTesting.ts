@@ -2,9 +2,12 @@ import assert from "assert";
 
 import { App } from "../App";
 import { ModKeyFlag } from "../control/Keybind";
-import { GridArea } from "../grid/GridArea";
 import { GridDimensions } from "../grid/GridDimensions";
-import { CursorUpdate, GridLayoutManager } from "../grid/GridLayoutManager";
+import {
+  CursorUpdate,
+  ElementArea,
+  GridLayoutManager,
+} from "../grid/GridLayoutManager";
 
 export class SampleApp extends App {
   layout: GridLayoutManager;
@@ -15,36 +18,44 @@ export class SampleApp extends App {
     this.layout = new GridLayoutManager(
       this.app,
       ((event: CustomEvent<CursorUpdate>) => {
-        console.log(event);
+        const curr = event.detail.curr;
+        const prev = event.detail.prev;
+        if (curr != undefined) {
+          curr.element.style.borderStyle = "solid";
+          curr.element.style.backgroundColor = "green";
+        }
+        if (prev != undefined) {
+          prev.element.style.borderStyle = "none";
+          prev.element.style.backgroundColor = "white";
+        }
       }).bind(this)
     );
 
-    const gridUpdate = document.createElement("div");
+    const gridAreaUpdateHandler = (event: CustomEvent<ElementArea>) => {
+      const area = event.detail.area;
+
+      const parts = [];
+      parts.push(`name: ${area.name}`);
+      parts.push(`row: ${area.row}`);
+      parts.push(`column: ${area.column}`);
+      parts.push(`height: ${area.height}`);
+      parts.push(`width: ${area.width}`);
+
+      event.detail.element.innerHTML = parts.join(", ");
+    };
 
     /* Handle updates to the initial element. */
     const initialElem = this.layout.createArea(
       undefined,
       undefined,
-      (event: CustomEvent<GridArea>) => {
-        const area = event.detail;
-
-        const parts = [];
-        parts.push(`row: ${area.row}`);
-        parts.push(`column: ${area.column}`);
-        parts.push(`height: ${area.height}`);
-        parts.push(`width: ${area.width}`);
-
-        gridUpdate.innerHTML = parts.join(", ");
-      }
+      gridAreaUpdateHandler
     );
     assert(initialElem != undefined);
-    initialElem.style.backgroundColor = "orange";
 
     const statusElem = document.createElement("div");
     const errorElem = document.createElement("div");
     initialElem.appendChild(statusElem);
     initialElem.appendChild(errorElem);
-    initialElem.appendChild(gridUpdate);
 
     /* Arrow keys can expand and contract the grid. */
     const expand = this.layout.expandHandler.bind(this.layout);
@@ -53,11 +64,22 @@ export class SampleApp extends App {
     const contractArea = this.layout.contractCursorAreaHandler.bind(
       this.layout
     );
+
+    /* Expand and create handler. */
+    const layout = this.layout;
+    const expandCreateArea = ((event: KeyboardEvent): boolean => {
+      return layout.expandCreateHandler(event, gridAreaUpdateHandler, true);
+    }).bind(this.layout);
+
     for (const key of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]) {
       this.keybinds.register(key, expand);
       this.keybinds.register(key, contract, [ModKeyFlag.ctrlKey]);
       this.keybinds.register(key, expandArea, [ModKeyFlag.shiftKey]);
       this.keybinds.register(key, contractArea, [ModKeyFlag.altKey]);
+      this.keybinds.register(key, expandCreateArea, [
+        ModKeyFlag.shiftKey,
+        ModKeyFlag.ctrlKey,
+      ]);
     }
 
     /* Basic resize handler: show info about size. */

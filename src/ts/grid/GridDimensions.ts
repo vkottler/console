@@ -7,6 +7,10 @@ export class GridDimensions {
     this.columns = columns;
   }
 
+  copy(): GridDimensions {
+    return new GridDimensions(this.rows, this.columns);
+  }
+
   get width(): number {
     return this.columns;
   }

@@ -31,14 +31,16 @@ describe("Testing the 'GridLayout' module.", () => {
     ).toBe(false);
 
     /* Expand the layout. */
-    expect(layout.expand(Translation.left, layoutContainer)).toBe(true);
-    expect(layout.expand(Translation.up, layoutContainer)).toBe(true);
+    expect(layout.expand(Translation.left, layoutContainer).success).toBe(true);
+    expect(layout.expand(Translation.up, layoutContainer).success).toBe(true);
 
     expect(area.row).toBe(1);
     expect(area.column).toBe(1);
 
-    expect(layout.expand(Translation.right, layoutContainer)).toBe(true);
-    expect(layout.expand(Translation.down, layoutContainer)).toBe(true);
+    expect(layout.expand(Translation.right, layoutContainer).success).toBe(
+      true
+    );
+    expect(layout.expand(Translation.down, layoutContainer).success).toBe(true);
 
     expect(area.row).toBe(1);
     expect(area.column).toBe(1);
@@ -56,11 +58,15 @@ describe("Testing the 'GridLayout' module.", () => {
     }
 
     /* Expand and contract. */
-    expect(layout.expand(Translation.right, layoutContainer)).toBe(true);
+    expect(layout.expand(Translation.right, layoutContainer).success).toBe(
+      true
+    );
     expect(layout.contract(Translation.left, layoutContainer)).toBe(true);
 
     /* Expand and contract. */
-    expect(layout.expand(Translation.right, layoutContainer)).toBe(true);
+    expect(layout.expand(Translation.right, layoutContainer).success).toBe(
+      true
+    );
     expect(layout.contract(Translation.right, layoutContainer)).toBe(true);
 
     /* Ensure we're back to initial conditions. */
@@ -75,7 +81,7 @@ describe("Testing the 'GridLayout' module.", () => {
 
     /* Expand in every direction. */
     for (const translation of allTranslations()) {
-      expect(layout.expand(translation, layoutContainer)).toBe(true);
+      expect(layout.expand(translation, layoutContainer).success).toBe(true);
     }
     expect(area.row).toBe(1);
     expect(area.column).toBe(1);
@@ -85,7 +91,7 @@ describe("Testing the 'GridLayout' module.", () => {
     expect(area.column).toBe(0);
 
     /* Expand left again. */
-    expect(layout.expand(Translation.left)).toBe(true);
+    expect(layout.expand(Translation.left).success).toBe(true);
     expect(area.column).toBe(1);
     expect(layout.width).toBe(3);
 
