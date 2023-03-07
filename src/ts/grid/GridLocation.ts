@@ -10,6 +10,10 @@ export class GridLocation {
     this.column = column;
   }
 
+  copy(): GridLocation {
+    return new GridLocation(this.row, this.column);
+  }
+
   set(row: number, column: number): GridLocation {
     this.row = row;
     this.column = column;
