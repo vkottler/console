@@ -1,9 +1,11 @@
+import { ActionManager } from "./control/ActionManager";
 import { KeybindManager } from "./control/KeybindManager";
 
 export abstract class App {
   app: HTMLElement;
   width: number;
   height: number;
+  actions: ActionManager;
   keybinds: KeybindManager;
 
   constructor(root: Element) {
@@ -14,7 +16,8 @@ export abstract class App {
     root.appendChild(this.app);
     this.app.style.height = "100%";
 
-    this.keybinds = new KeybindManager();
+    this.actions = new ActionManager();
+    this.keybinds = new KeybindManager(this.actions);
 
     window.onresize = this.pollDimensions.bind(this);
     this.pollDimensions();

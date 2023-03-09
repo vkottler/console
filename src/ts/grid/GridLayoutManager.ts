@@ -1,6 +1,6 @@
 import assert from "assert";
 
-import { eventDirection, translationName } from "../cartesian/Translation";
+import { Translation, translationName } from "../cartesian/Translation";
 import { AreaUpdateHandler, GridArea } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
 import { GridLayout } from "./GridLayout";
@@ -158,10 +158,12 @@ export class GridLayoutManager {
     this.container.addEventListener(ERROR_MESSAGE, handler as EventListener);
   }
 
-  resizeCursorAreaHandler(event: KeyboardEvent, isExpand: boolean): boolean {
+  resizeCursorAreaHandler(
+    direction: Translation | undefined,
+    isExpand: boolean
+  ): boolean {
     let resizeResult = false;
 
-    const direction = eventDirection(event);
     if (direction != undefined) {
       if (isExpand) {
         resizeResult = this.layout.expandCursorArea(direction, this.container);
@@ -185,25 +187,17 @@ export class GridLayoutManager {
         this.#fireGridResize();
       }
     }
+
     return direction != undefined;
   }
 
-  expandCursorAreaHandler(event: KeyboardEvent): boolean {
-    return this.resizeCursorAreaHandler(event, true);
-  }
-
-  contractCursorAreaHandler(event: KeyboardEvent): boolean {
-    return this.resizeCursorAreaHandler(event, false);
-  }
-
-  resizeHandler(
-    event: KeyboardEvent,
+  expandHandler(
+    direction: Translation | undefined,
     createArea: boolean,
     handler?: GridAreaUpdateHandler,
     moveCursor = false,
     kind = "div"
   ): boolean {
-    const direction = eventDirection(event);
     if (direction != undefined) {
       /* Expanding the grid can't fail currently. */
       const expandResult = this.layout.expand(direction, this.container);
@@ -228,22 +222,7 @@ export class GridLayoutManager {
     return direction != undefined;
   }
 
-  expandHandler(event: KeyboardEvent): boolean {
-    return this.resizeHandler(event, false);
-  }
-
-  expandCreateHandler(
-    event: KeyboardEvent,
-    handler?: GridAreaUpdateHandler,
-    moveCursor = false,
-    kind = "div"
-  ): boolean {
-    return this.resizeHandler(event, true, handler, moveCursor, kind);
-  }
-
-  contractHandler(event: KeyboardEvent): boolean {
-    const direction = eventDirection(event);
-
+  contractHandler(direction: Translation | undefined): boolean {
     if (direction != undefined) {
       if (this.layout.contract(direction, this.container)) {
         this.#fireGridResize();
@@ -253,7 +232,6 @@ export class GridLayoutManager {
         );
       }
     }
-
     return direction != undefined;
   }
 }
