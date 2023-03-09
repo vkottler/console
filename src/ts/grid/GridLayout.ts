@@ -343,7 +343,7 @@ export class GridLayout {
        * If the area and grid have the same dimensions, we can re-size both
        * to have height and width 1.
        */
-      this.#normalize(area, element);
+      this.#normalize(newArea, element);
     }
 
     return result;

@@ -1,16 +1,23 @@
 import assert from "assert";
 
 import { App } from "../App";
+import {
+  allTranslations,
+  eventDirection,
+  translationName,
+} from "../cartesian/Translation";
 import { ModKeyFlag } from "../control/Keybind";
 import { GridDimensions } from "../grid/GridDimensions";
 import {
   CursorUpdate,
   ElementArea,
+  GridAreaUpdateHandler,
   GridLayoutManager,
 } from "../grid/GridLayoutManager";
 
 export class SampleApp extends App {
   layout: GridLayoutManager;
+  gridAreaUpdateHandler: GridAreaUpdateHandler;
 
   constructor(root: Element) {
     super(root);
@@ -31,7 +38,7 @@ export class SampleApp extends App {
       }).bind(this)
     );
 
-    const gridAreaUpdateHandler = (event: CustomEvent<ElementArea>) => {
+    this.gridAreaUpdateHandler = (event: CustomEvent<ElementArea>) => {
       const area = event.detail.area;
 
       const parts = [];
@@ -48,51 +55,130 @@ export class SampleApp extends App {
     const initialElem = this.layout.createArea(
       undefined,
       undefined,
-      gridAreaUpdateHandler
+      this.gridAreaUpdateHandler
     );
     assert(initialElem != undefined);
 
-    const statusElem = document.createElement("div");
-    const errorElem = document.createElement("div");
-    initialElem.appendChild(statusElem);
-    initialElem.appendChild(errorElem);
-
-    /* Arrow keys can expand and contract the grid. */
-    const expand = this.layout.expandHandler.bind(this.layout);
-    const contract = this.layout.contractHandler.bind(this.layout);
-    const expandArea = this.layout.expandCursorAreaHandler.bind(this.layout);
-    const contractArea = this.layout.contractCursorAreaHandler.bind(
-      this.layout
-    );
-
-    /* Expand and create handler. */
-    const layout = this.layout;
-    const expandCreateArea = ((event: KeyboardEvent): boolean => {
-      return layout.expandCreateHandler(event, gridAreaUpdateHandler, true);
-    }).bind(this.layout);
-
-    for (const key of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]) {
-      this.keybinds.register(key, expand);
-      this.keybinds.register(key, contract, [ModKeyFlag.ctrlKey]);
-      this.keybinds.register(key, expandArea, [ModKeyFlag.shiftKey]);
-      this.keybinds.register(key, contractArea, [ModKeyFlag.altKey]);
-      this.keybinds.register(key, expandCreateArea, [
-        ModKeyFlag.shiftKey,
-        ModKeyFlag.ctrlKey,
-      ]);
-    }
+    this.#registerActions();
+    this.#registerKeybinds();
 
     /* Basic resize handler: show info about size. */
     this.layout.registerResizeHandler((event: CustomEvent<GridDimensions>) => {
       const dimensions = event.detail;
-      statusElem.innerHTML =
-        `rows: ${dimensions.rows}<br>` + `columns: ${dimensions.columns}`;
+      console.log(
+        `grid: ${dimensions.rows} rows, ${dimensions.columns} columns`
+      );
     });
 
     /* Basic error handler: show info about error. */
     this.layout.registerErrorHandler((event: CustomEvent<string>) => {
-      errorElem.innerHTML = `Error: ${event.detail}`;
+      console.warn(`Error: ${event.detail}`);
     });
+  }
+
+  #registerActions() {
+    const layout = this.layout;
+
+    for (const direction of allTranslations()) {
+      /* Expand. */
+      assert(
+        this.actions.register(
+          `expand${translationName(direction, true)}`,
+          (() => {
+            return layout.expandHandler(direction, false);
+          }).bind(layout)
+        )
+      );
+
+      /* Contract. */
+      assert(
+        this.actions.register(
+          `contract${translationName(direction, true)}`,
+          (() => {
+            return layout.contractHandler(direction);
+          }).bind(layout)
+        )
+      );
+
+      /* Expand cursor area. */
+      assert(
+        this.actions.register(
+          `expandCursorArea${translationName(direction, true)}`,
+          (() => {
+            return layout.resizeCursorAreaHandler(direction, true);
+          }).bind(layout)
+        )
+      );
+
+      /* Contract cursor area. */
+      assert(
+        this.actions.register(
+          `contractCursorArea${translationName(direction, true)}`,
+          (() => {
+            return layout.resizeCursorAreaHandler(direction, false);
+          }).bind(layout)
+        )
+      );
+
+      /* Expand and create handler. */
+      const gridAreaUpdateHandler = this.gridAreaUpdateHandler;
+      assert(
+        this.actions.register(
+          `expandAndCreateArea${translationName(direction, true)}`,
+          (() => {
+            return layout.expandHandler(
+              direction,
+              true,
+              gridAreaUpdateHandler,
+              true
+            );
+          }).bind(layout)
+        )
+      );
+    }
+  }
+
+  #registerKeybinds() {
+    /* Arrow keys can expand and contract the grid. */
+    for (const key of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]) {
+      const direction = eventDirection(
+        new KeyboardEvent("keydown", { key: key })
+      );
+      assert(direction != undefined);
+      const directionSuffix = translationName(direction, true);
+
+      assert(this.keybinds.registerAction(`expand${directionSuffix}`, key));
+
+      assert(
+        this.keybinds.registerAction(`contract${directionSuffix}`, key, [
+          ModKeyFlag.ctrlKey,
+        ])
+      );
+
+      assert(
+        this.keybinds.registerAction(
+          `expandCursorArea${directionSuffix}`,
+          key,
+          [ModKeyFlag.shiftKey]
+        )
+      );
+
+      assert(
+        this.keybinds.registerAction(
+          `contractCursorArea${directionSuffix}`,
+          key,
+          [ModKeyFlag.altKey]
+        )
+      );
+
+      assert(
+        this.keybinds.registerAction(
+          `expandAndCreateArea${directionSuffix}`,
+          key,
+          [ModKeyFlag.shiftKey, ModKeyFlag.ctrlKey]
+        )
+      );
+    }
   }
 
   dispatch() {

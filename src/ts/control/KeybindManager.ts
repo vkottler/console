@@ -1,3 +1,6 @@
+import assert from "assert";
+
+import { ActionManager } from "./ActionManager";
 import {
   Keybind,
   KeybindCallback,
@@ -9,12 +12,44 @@ import {
 export class KeybindManager {
   keyup: KeybindMap;
   keydown: KeybindMap;
+  actions: ActionManager;
+  actionKeybindCallbacks: Map<string, KeybindCallback>;
 
-  constructor() {
+  constructor(actions: ActionManager) {
+    this.actions = actions;
     this.keyup = new Map<string, Map<number, Keybind>>();
     this.keydown = new Map<string, Map<number, Keybind>>();
+    this.actionKeybindCallbacks = new Map<string, KeybindCallback>();
     document.addEventListener("keydown", this.handleKeydown.bind(this));
     document.addEventListener("keyup", this.handleKeyup.bind(this));
+  }
+
+  #getActionKeybindCallback(action: string): KeybindCallback {
+    let result = this.actionKeybindCallbacks.get(action);
+
+    if (result == undefined) {
+      result = ((event: KeyboardEvent) => {
+        assert(event);
+        return this.actions.trigger(action);
+      }).bind(this);
+      this.actionKeybindCallbacks.set(action, result);
+    }
+
+    return result;
+  }
+
+  registerAction(
+    action: string,
+    key: string,
+    mods?: Iterable<ModKeyFlag>,
+    keydown = true
+  ): boolean {
+    return this.register(
+      key,
+      this.#getActionKeybindCallback(action),
+      mods,
+      keydown
+    );
   }
 
   register(
