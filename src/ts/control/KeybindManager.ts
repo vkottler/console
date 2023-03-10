@@ -4,10 +4,13 @@ import { ActionManager } from "./ActionManager";
 import {
   Keybind,
   KeybindCallback,
+  KeybindConfig,
   KeybindMap,
   ModKeyFlag,
   modKeyValue,
 } from "./Keybind";
+
+export type ActionKeybindMap = { [key: string]: KeybindConfig };
 
 export class KeybindManager {
   keyup: KeybindMap;
@@ -52,6 +55,22 @@ export class KeybindManager {
     );
   }
 
+  registerActionConfig(
+    action: string,
+    config: KeybindConfig,
+    keydown = true
+  ): boolean {
+    return this.registerAction(action, config.key, config.mods, keydown);
+  }
+
+  registerConfigMap(config: ActionKeybindMap): boolean {
+    let result = true;
+    for (const action in config) {
+      result &&= this.registerActionConfig(action, config[action]);
+    }
+    return result;
+  }
+
   register(
     key: string,
     dispatch: KeybindCallback,
@@ -66,6 +85,14 @@ export class KeybindManager {
     }
 
     return bind.register(map);
+  }
+
+  registerConfig(
+    config: KeybindConfig,
+    dispatch: KeybindCallback,
+    keydown = true
+  ): boolean {
+    return this.register(config.key, dispatch, config.mods, keydown);
   }
 
   handle(event: KeyboardEvent, map: KeybindMap) {

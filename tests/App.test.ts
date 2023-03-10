@@ -22,6 +22,11 @@ describe("Testing the 'App' module.", () => {
     app.pollDimensions();
     app.dispatch();
 
+    /* Register action. */
+    expect(app.keybinds.registerAction("testAction", "key", undefined)).toBe(
+      true
+    );
+
     /* Keydown. */
     expect(app.keybinds.register("Enter", keybindCallback)).toBe(true);
     expect(app.keybinds.register("Enter", keybindCallback)).toBe(false);
@@ -32,6 +37,21 @@ describe("Testing the 'App' module.", () => {
     /* Keyup. */
     expect(
       app.keybinds.register("Enter", keybindCallback, undefined, false)
+    ).toBe(true);
+
+    /* Keybind config. */
+    expect(
+      app.keybinds.registerConfig(
+        { key: "Enter", mods: [ModKeyFlag.shiftKey] },
+        keybindCallback
+      )
+    ).toBe(true);
+    expect(
+      app.keybinds.registerConfig(
+        { key: "Enter", mods: [ModKeyFlag.shiftKey] },
+        keybindCallback,
+        false
+      )
     ).toBe(true);
 
     /* Test keybinds. */
@@ -59,12 +79,10 @@ describe("Testing the 'App' module.", () => {
 
     /* Expand cursor in all directions. */
     for (const key of keys) {
-      app.keybinds.handleKeydown(
-        new KeyboardEvent("keydown", { key: key, shiftKey: true })
-      );
-      app.keybinds.handleKeydown(
-        new KeyboardEvent("keydown", { key: key, shiftKey: true })
-      );
+      const keybind = new Keybind(key, undefined, [ModKeyFlag.shiftKey]);
+      const event = keybind.createEvent();
+      app.keybinds.handleKeydown(event);
+      app.keybinds.handleKeydown(event);
     }
 
     /* Expand grid in all directions twice. */

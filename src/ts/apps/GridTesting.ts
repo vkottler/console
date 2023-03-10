@@ -7,6 +7,7 @@ import {
   translationName,
 } from "../cartesian/Translation";
 import { ModKeyFlag } from "../control/Keybind";
+import { ActionKeybindMap } from "../control/KeybindManager";
 import { GridDimensions } from "../grid/GridDimensions";
 import {
   CursorUpdate,
@@ -139,6 +140,8 @@ export class SampleApp extends App {
   }
 
   #registerKeybinds() {
+    const keybindConfig: ActionKeybindMap = {};
+
     /* Arrow keys can expand and contract the grid. */
     for (const key of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]) {
       const direction = eventDirection(
@@ -147,38 +150,27 @@ export class SampleApp extends App {
       assert(direction != undefined);
       const directionSuffix = translationName(direction, true);
 
-      assert(this.keybinds.registerAction(`expand${directionSuffix}`, key));
+      keybindConfig[`expand${directionSuffix}`] = { key: key };
 
-      assert(
-        this.keybinds.registerAction(`contract${directionSuffix}`, key, [
-          ModKeyFlag.ctrlKey,
-        ])
-      );
-
-      assert(
-        this.keybinds.registerAction(
-          `expandCursorArea${directionSuffix}`,
-          key,
-          [ModKeyFlag.shiftKey]
-        )
-      );
-
-      assert(
-        this.keybinds.registerAction(
-          `contractCursorArea${directionSuffix}`,
-          key,
-          [ModKeyFlag.altKey]
-        )
-      );
-
-      assert(
-        this.keybinds.registerAction(
-          `expandAndCreateArea${directionSuffix}`,
-          key,
-          [ModKeyFlag.shiftKey, ModKeyFlag.ctrlKey]
-        )
-      );
+      keybindConfig[`contract${directionSuffix}`] = {
+        key: key,
+        mods: [ModKeyFlag.ctrlKey],
+      };
+      keybindConfig[`expandCursorArea${directionSuffix}`] = {
+        key: key,
+        mods: [ModKeyFlag.shiftKey],
+      };
+      keybindConfig[`contractCursorArea${directionSuffix}`] = {
+        key: key,
+        mods: [ModKeyFlag.altKey],
+      };
+      keybindConfig[`expandAndCreateArea${directionSuffix}`] = {
+        key: key,
+        mods: [ModKeyFlag.shiftKey, ModKeyFlag.ctrlKey],
+      };
     }
+
+    assert(this.keybinds.registerConfigMap(keybindConfig));
   }
 
   dispatch() {
