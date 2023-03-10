@@ -1,6 +1,6 @@
 import assert from "assert";
 
-import { eventDirection, translationName } from "../cartesian/Translation";
+import { Translation, translationName } from "../cartesian/Translation";
 import { AreaUpdateHandler, GridArea } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
 import { GridLayout } from "./GridLayout";
@@ -12,12 +12,13 @@ const GRID_AREA_UPDATE = "gridAreaUpdate";
 
 type GridResizeHandler = (event: CustomEvent<GridDimensions>) => void;
 type GridErrorHandler = (event: CustomEvent<string>) => void;
-type GridAreaUpdateHandler = (event: CustomEvent<GridArea>) => void;
 
 export type ElementArea = {
   element: HTMLElement;
   area: GridArea;
 };
+
+export type GridAreaUpdateHandler = (event: CustomEvent<ElementArea>) => void;
 
 export type CursorUpdate = {
   prev: ElementArea | undefined;
@@ -62,7 +63,9 @@ export class GridLayoutManager {
     const element = this.elements.get(area.areaId);
     if (element != undefined) {
       element.dispatchEvent(
-        new CustomEvent<GridArea>(GRID_AREA_UPDATE, { detail: area })
+        new CustomEvent<ElementArea>(GRID_AREA_UPDATE, {
+          detail: { area: area, element: element },
+        })
       );
     }
   }
@@ -96,6 +99,7 @@ export class GridLayoutManager {
     location?: GridLocation,
     dimensions?: GridDimensions,
     handler?: GridAreaUpdateHandler,
+    moveCursor = false,
     kind = "div"
   ): HTMLElement | undefined {
     const element = document.createElement(kind);
@@ -110,7 +114,7 @@ export class GridLayoutManager {
     /* Set this early, in case we need it in the cursor-update handler. */
     this.elements.set(area.areaId, element);
 
-    if (this.layout.validArea(area, true)) {
+    if (this.layout.validArea(area, true, moveCursor)) {
       /* Ensure the layout change gets applied. */
       this.container.appendChild(element);
       this.layout.apply(this.container);
@@ -154,10 +158,12 @@ export class GridLayoutManager {
     this.container.addEventListener(ERROR_MESSAGE, handler as EventListener);
   }
 
-  resizeCursorAreaHandler(event: KeyboardEvent, isExpand: boolean): boolean {
+  resizeCursorAreaHandler(
+    direction: Translation | undefined,
+    isExpand: boolean
+  ): boolean {
     let resizeResult = false;
 
-    const direction = eventDirection(event);
     if (direction != undefined) {
       if (isExpand) {
         resizeResult = this.layout.expandCursorArea(direction, this.container);
@@ -181,31 +187,34 @@ export class GridLayoutManager {
         this.#fireGridResize();
       }
     }
+
     return direction != undefined;
   }
 
-  expandCursorAreaHandler(event: KeyboardEvent): boolean {
-    return this.resizeCursorAreaHandler(event, true);
-  }
-
-  contractCursorAreaHandler(event: KeyboardEvent): boolean {
-    return this.resizeCursorAreaHandler(event, false);
-  }
-
-  resizeHandler(event: KeyboardEvent, isExpand: boolean): boolean {
-    const direction = eventDirection(event);
+  expandHandler(
+    direction: Translation | undefined,
+    createArea: boolean,
+    handler?: GridAreaUpdateHandler,
+    moveCursor = false,
+    kind = "div"
+  ): boolean {
     if (direction != undefined) {
-      if (isExpand) {
-        /* Expanding the grid can't fail currently. */
-        if (this.layout.expand(direction, this.container)) {
-          this.#fireGridResize();
-        }
-      } else {
-        if (this.layout.contract(direction, this.container)) {
-          this.#fireGridResize();
-        } else {
-          this.#fireErrorMessage(
-            `Couldn't contract grid ${translationName(direction)}.`
+      /* Expanding the grid can't fail currently. */
+      const expandResult = this.layout.expand(direction, this.container);
+
+      if (expandResult.success) {
+        this.#fireGridResize();
+
+        /* Create a new area if requested. */
+        if (createArea) {
+          assert(
+            this.createArea(
+              expandResult.newLocation,
+              expandResult.newDimensions,
+              handler,
+              moveCursor,
+              kind
+            ) != undefined
           );
         }
       }
@@ -213,11 +222,16 @@ export class GridLayoutManager {
     return direction != undefined;
   }
 
-  expandHandler(event: KeyboardEvent): boolean {
-    return this.resizeHandler(event, true);
-  }
-
-  contractHandler(event: KeyboardEvent): boolean {
-    return this.resizeHandler(event, false);
+  contractHandler(direction: Translation | undefined): boolean {
+    if (direction != undefined) {
+      if (this.layout.contract(direction, this.container)) {
+        this.#fireGridResize();
+      } else {
+        this.#fireErrorMessage(
+          `Couldn't contract grid ${translationName(direction)}.`
+        );
+      }
+    }
+    return direction != undefined;
   }
 }

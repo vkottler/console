@@ -27,6 +27,12 @@ function newRow(columns: number): string[] {
 
 type CursorUpdateHandler = (prevCursor: number, currCursor: number) => void;
 
+type ExpandResult = {
+  success: boolean;
+  newLocation: GridLocation;
+  newDimensions: GridDimensions;
+};
+
 export class GridLayout {
   dimensions: GridDimensions;
   cells: string[][];
@@ -63,7 +69,6 @@ export class GridLayout {
   get isNormal(): boolean {
     return this.width == 1 && this.height == 1;
   }
-
   validLocation(location: GridLocation, dimensions?: GridDimensions): boolean {
     return location.inBounds(this.dimensions, dimensions);
   }
@@ -76,15 +81,18 @@ export class GridLayout {
     }
   }
 
-  validArea(area: GridArea, assign = false): boolean {
+  validArea(area: GridArea, assign = false, cursor = false): boolean {
     const result = validArea(this, area, assign);
 
     /*
      * Initialize the cursor if this area is valid and being assigned to the
      * grid.
      */
-    if (result && assign && this.cursor == INIT_ID) {
-      this.#updateCursor(area.areaId);
+    if (result && assign) {
+      this.byId.set(area.areaId, area);
+      if (this.cursor == INIT_ID || cursor) {
+        this.#updateCursor(area.areaId);
+      }
     }
 
     return result;
@@ -319,10 +327,14 @@ export class GridLayout {
     direction: Translation,
     element?: HTMLElement
   ): boolean {
-    const result = area.expand(direction, this.dimensions);
+    const newArea = area.copy();
+
+    let result = newArea.expand(direction, this.dimensions, true, false);
+    result &&= this.validArea(newArea, true);
 
     if (result) {
-      assert(this.validArea(area, true));
+      newArea.signalHandler();
+
       if (element != undefined) {
         this.apply(element);
       }
@@ -331,7 +343,7 @@ export class GridLayout {
        * If the area and grid have the same dimensions, we can re-size both
        * to have height and width 1.
        */
-      this.#normalize(area, element);
+      this.#normalize(newArea, element);
     }
 
     return result;
@@ -348,13 +360,23 @@ export class GridLayout {
     return result;
   }
 
-  expand(direction: Translation, element?: HTMLElement): boolean {
+  expand(direction: Translation, element?: HTMLElement): ExpandResult {
+    const newLocation = new GridLocation();
+    const newDimensions = new GridDimensions();
+
+    const result = {
+      success: true,
+      newLocation: newLocation,
+      newDimensions: newDimensions,
+    };
+
     switch (direction) {
       case Translation.up:
         this.cells.unshift(newRow(this.dimensions.columns));
         break;
       case Translation.down:
         this.cells.push(newRow(this.dimensions.columns));
+        newLocation.row = this.dimensions.rows;
         break;
       case Translation.left:
         for (let row = 0; row < this.dimensions.rows; row++) {
@@ -365,13 +387,16 @@ export class GridLayout {
         for (let row = 0; row < this.dimensions.rows; row++) {
           this.cells[row].push(EMPTY);
         }
+        newLocation.column = this.dimensions.columns;
         break;
     }
 
     if (isVertical(direction)) {
+      newDimensions.columns = this.dimensions.columns;
       this.dimensions.rows++;
     }
     if (isHorizontal(direction)) {
+      newDimensions.rows = this.dimensions.rows;
       this.dimensions.columns++;
     }
 
@@ -391,7 +416,7 @@ export class GridLayout {
       this.apply(element);
     }
 
-    return true;
+    return result;
   }
 
   apply(element: HTMLElement) {

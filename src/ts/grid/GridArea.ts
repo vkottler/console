@@ -26,8 +26,8 @@ export type AreaUpdateHandler = (area: GridArea) => void;
 export class GridArea {
   location: GridLocation;
   dimensions: GridDimensions;
-  areaId: number;
   handler: AreaUpdateHandler | undefined;
+  areaId: number;
 
   constructor(
     location?: GridLocation,
@@ -47,7 +47,16 @@ export class GridArea {
     this.areaId = areaId;
   }
 
-  #signalHandler() {
+  copy(): GridArea {
+    return new GridArea(
+      this.location.copy(),
+      this.dimensions.copy(),
+      this.handler,
+      this.areaId
+    );
+  }
+
+  signalHandler() {
     if (this.handler != undefined) {
       this.handler(this);
     }
@@ -129,7 +138,7 @@ export class GridArea {
       update
     );
     if (result != undefined) {
-      this.#signalHandler();
+      this.signalHandler();
     }
     return result;
   }
@@ -162,7 +171,7 @@ export class GridArea {
     if (direction == Translation.right || direction == Translation.down) {
       assert(this.translate(direction, undefined, update) != undefined);
     } else {
-      this.#signalHandler();
+      this.signalHandler();
     }
 
     return true;
@@ -171,7 +180,8 @@ export class GridArea {
   expand(
     direction: Translation,
     bounds?: GridDimensions,
-    update = true
+    update = true,
+    signalHandler = true
   ): boolean {
     let result = true;
     let location = this.location;
@@ -213,7 +223,9 @@ export class GridArea {
       if (isHorizontal(direction)) {
         this.dimensions.columns++;
       }
-      this.#signalHandler();
+      if (signalHandler) {
+        this.signalHandler();
+      }
     }
 
     return result;

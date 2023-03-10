@@ -40,17 +40,29 @@ export function eventDirection(event: KeyboardEvent): Translation | undefined {
   }
 }
 
-export function translationName(translation: Translation) {
+export function translationName(translation: Translation, capitalize = false) {
+  let result = "";
+
   switch (translation) {
     case Translation.up:
-      return "up";
+      result = "up";
+      break;
     case Translation.down:
-      return "down";
+      result = "down";
+      break;
     case Translation.left:
-      return "left";
+      result = "left";
+      break;
     case Translation.right:
-      return "right";
+      result = "right";
+      break;
   }
+
+  if (capitalize) {
+    result = result[0].toUpperCase() + result.substr(1);
+  }
+
+  return result;
 }
 
 export function isVertical(direction: Translation): boolean {
