@@ -1,11 +1,7 @@
 import assert from "assert";
 
 import { App } from "../App";
-import {
-  allTranslations,
-  eventDirection,
-  translationName,
-} from "../cartesian/Translation";
+import { eventDirection, translationName } from "../cartesian/Translation";
 import { ModKeyFlag } from "../control/Keybind";
 import { ActionKeybindMap } from "../control/KeybindManager";
 import { GridDimensions } from "../grid/GridDimensions";
@@ -60,7 +56,9 @@ export class SampleApp extends App {
     );
     assert(initialElem != undefined);
 
-    this.#registerActions();
+    assert(
+      this.layout.registerActions(this.actions, this.gridAreaUpdateHandler)
+    );
     this.#registerKeybinds();
 
     /* Basic resize handler: show info about size. */
@@ -75,68 +73,6 @@ export class SampleApp extends App {
     this.layout.registerErrorHandler((event: CustomEvent<string>) => {
       console.warn(`Error: ${event.detail}`);
     });
-  }
-
-  #registerActions() {
-    const layout = this.layout;
-
-    for (const direction of allTranslations()) {
-      /* Expand. */
-      assert(
-        this.actions.register(
-          `expand${translationName(direction, true)}`,
-          (() => {
-            return layout.expandHandler(direction, false);
-          }).bind(layout)
-        )
-      );
-
-      /* Contract. */
-      assert(
-        this.actions.register(
-          `contract${translationName(direction, true)}`,
-          (() => {
-            return layout.contractHandler(direction);
-          }).bind(layout)
-        )
-      );
-
-      /* Expand cursor area. */
-      assert(
-        this.actions.register(
-          `expandCursorArea${translationName(direction, true)}`,
-          (() => {
-            return layout.resizeCursorAreaHandler(direction, true);
-          }).bind(layout)
-        )
-      );
-
-      /* Contract cursor area. */
-      assert(
-        this.actions.register(
-          `contractCursorArea${translationName(direction, true)}`,
-          (() => {
-            return layout.resizeCursorAreaHandler(direction, false);
-          }).bind(layout)
-        )
-      );
-
-      /* Expand and create handler. */
-      const gridAreaUpdateHandler = this.gridAreaUpdateHandler;
-      assert(
-        this.actions.register(
-          `expandAndCreateArea${translationName(direction, true)}`,
-          (() => {
-            return layout.expandHandler(
-              direction,
-              true,
-              gridAreaUpdateHandler,
-              true
-            );
-          }).bind(layout)
-        )
-      );
-    }
   }
 
   #registerKeybinds() {
