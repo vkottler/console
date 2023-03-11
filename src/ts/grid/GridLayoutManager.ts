@@ -1,6 +1,11 @@
 import assert from "assert";
 
-import { Translation, translationName } from "../cartesian/Translation";
+import {
+  allTranslations,
+  Translation,
+  translationName,
+} from "../cartesian/Translation";
+import { ActionManager } from "../control/ActionManager";
 import { AreaUpdateHandler, GridArea } from "./GridArea";
 import { GridDimensions } from "./GridDimensions";
 import { GridLayout } from "./GridLayout";
@@ -233,5 +238,71 @@ export class GridLayoutManager {
       }
     }
     return direction != undefined;
+  }
+
+  registerActions(
+    actions: ActionManager,
+    gridAreaUpdateHandler: GridAreaUpdateHandler
+  ): boolean {
+    for (const direction of allTranslations()) {
+      const suffix = translationName(direction, true);
+
+      /* Expand. */
+      assert(
+        actions.register(
+          `expand${suffix}`,
+          (() => {
+            return this.expandHandler(direction, false);
+          }).bind(this)
+        )
+      );
+
+      /* Contract. */
+      assert(
+        actions.register(
+          `contract${suffix}`,
+          (() => {
+            return this.contractHandler(direction);
+          }).bind(this)
+        )
+      );
+
+      /* Expand cursor area. */
+      assert(
+        actions.register(
+          `expandCursorArea${suffix}`,
+          (() => {
+            return this.resizeCursorAreaHandler(direction, true);
+          }).bind(this)
+        )
+      );
+
+      /* Contract cursor area. */
+      assert(
+        actions.register(
+          `contractCursorArea${suffix}`,
+          (() => {
+            return this.resizeCursorAreaHandler(direction, false);
+          }).bind(this)
+        )
+      );
+
+      /* Expand and create handler. */
+      assert(
+        actions.register(
+          `expandAndCreateArea${suffix}`,
+          (() => {
+            return this.expandHandler(
+              direction,
+              true,
+              gridAreaUpdateHandler,
+              true
+            );
+          }).bind(this)
+        )
+      );
+    }
+
+    return true;
   }
 }

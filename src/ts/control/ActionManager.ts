@@ -1,17 +1,23 @@
+import { Namespace } from "../Namespace";
+
 export type ActionCallback = () => void;
 
 export class ActionManager {
   actionMap: Map<string, ActionCallback>;
+  names: Namespace;
 
   constructor() {
     this.actionMap = new Map<string, ActionCallback>();
+    this.names = new Namespace();
   }
 
   register(action: string, callback: ActionCallback): boolean {
     let result = false;
 
-    if (!this.actionMap.has(action)) {
-      this.actionMap.set(action, callback);
+    const name = this.names.name(action);
+
+    if (!this.actionMap.has(name)) {
+      this.actionMap.set(name, callback);
       result = true;
     }
 
@@ -19,7 +25,7 @@ export class ActionManager {
   }
 
   trigger(action: string): boolean {
-    const callback = this.actionMap.get(action);
+    const callback = this.actionMap.get(this.names.name(action));
     if (callback != undefined) {
       callback();
     }
