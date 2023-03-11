@@ -1,5 +1,5 @@
-import { SampleApp } from "../src/ts/apps/GridTesting";
-import { Keybind, ModKeyFlag } from "../src/ts/control/Keybind";
+import { SampleApp } from "../../src/ts/apps/GridTesting";
+import { Keybind, ModKeyFlag } from "../../src/ts/control/Keybind";
 
 function keybindCallback(event: KeyboardEvent): boolean {
   expect(event);
