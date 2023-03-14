@@ -2,7 +2,7 @@ import {
   CursorUpdate,
   CursorUpdateHandler,
   ElementArea,
-} from "../grid/GridLayoutManager";
+} from "../grid/layout/Manager";
 
 export abstract class CursorInterface {
   handler: CursorUpdateHandler;

@@ -1,5 +1,5 @@
 import { Translation } from "../cartesian/Translation";
-import { GridDimensions } from "./GridDimensions";
+import { GridDimensions } from "./Dimensions";
 
 export class GridLocation {
   row: number;

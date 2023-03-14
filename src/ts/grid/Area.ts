@@ -10,8 +10,8 @@ import {
   isVertical,
   Translation,
 } from "../cartesian/Translation";
-import { GridDimensions } from "./GridDimensions";
-import { GridLocation } from "./GridLocation";
+import { GridDimensions } from "./Dimensions";
+import { GridLocation } from "./Location";
 
 export const EMPTY = ".";
 export const INIT_ID = -1;

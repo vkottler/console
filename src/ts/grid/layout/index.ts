@@ -5,17 +5,17 @@ import {
   isHorizontal,
   isVertical,
   Translation,
-} from "../cartesian/Translation";
-import { AreaUpdateHandler, GridArea, INIT_ID } from "./GridArea";
-import { GridDimensions } from "./GridDimensions";
+} from "../../cartesian/Translation";
+import { AreaUpdateHandler, GridArea, INIT_ID } from "../Area";
+import { GridDimensions } from "../Dimensions";
+import { GridLocation } from "../Location";
 import {
   apply,
   EMPTY,
   isColumnEmpty,
   isRowEmpty,
   validArea,
-} from "./GridLayoutInterface";
-import { GridLocation } from "./GridLocation";
+} from "./Interface";
 
 function newRow(columns: number): string[] {
   const newRow = [];

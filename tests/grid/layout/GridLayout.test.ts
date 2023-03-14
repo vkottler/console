@@ -1,9 +1,9 @@
 import {
   allTranslations,
   Translation,
-} from "../../src/ts/cartesian/Translation";
-import { GridLayout } from "../../src/ts/grid/GridLayout";
-import { GridLocation } from "../../src/ts/grid/GridLocation";
+} from "../../../src/ts/cartesian/Translation";
+import { GridLayout } from "../../../src/ts/grid/layout";
+import { GridLocation } from "../../../src/ts/grid/Location";
 
 describe("Testing the 'GridLayout' module.", () => {
   test("Test valid locations.", () => {
