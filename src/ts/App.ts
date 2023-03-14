@@ -1,5 +1,5 @@
 import { ActionManager } from "./control/ActionManager";
-import { KeybindManager } from "./control/KeybindManager";
+import { KeybindManager } from "./control/keybind/Manager";
 
 export class App {
   app: HTMLElement;

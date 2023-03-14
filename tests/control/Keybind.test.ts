@@ -1,4 +1,4 @@
-import { createEvent, Keybind, ModKeyFlag } from "../../src/ts/control/Keybind";
+import { createEvent, Keybind, ModKeyFlag } from "../../src/ts/control/keybind";
 
 describe("Testing the 'Keybind' module.", () => {
   test("Basic keybind interactions.", () => {

@@ -1,10 +1,8 @@
 import assert from "assert";
 
 import { App } from "../App";
-import {
-  GridAreaUpdateHandler,
-  GridLayoutManager,
-} from "../grid/layout/Manager";
+import { GridLayoutManager } from "../grid/layout/Manager";
+import { GridAreaUpdateHandler } from "../grid/layout/ManagerBase";
 import { sampleGridUpdateHandler, sampleLayoutManager } from "./Staging";
 
 export abstract class BaseSampleApp extends App {

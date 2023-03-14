@@ -1,6 +1,6 @@
 import assert from "assert";
 
-import { ActionManager } from "./ActionManager";
+import { ActionManager } from "../ActionManager";
 import {
   Keybind,
   KeybindCallback,
@@ -8,7 +8,7 @@ import {
   KeybindMap,
   ModKeyFlag,
   modKeyValue,
-} from "./Keybind";
+} from ".";
 
 export type ActionKeybindMap = { [key: string]: KeybindConfig };
 

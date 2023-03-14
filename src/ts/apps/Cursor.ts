@@ -1,5 +1,5 @@
 import { CursorInterface } from "../control/CursorInterface";
-import { ElementArea } from "../grid/layout/Manager";
+import { ElementArea } from "../grid/layout/ManagerBase";
 
 export class Cursor extends CursorInterface {
   applyCursorStyle(area: ElementArea) {
