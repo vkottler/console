@@ -1,4 +1,4 @@
-import { SampleApp } from "./ts/apps/GridTesting";
+import { SampleApp } from "./ts/apps/ManageAreasTesting";
 
 const APP_PERIOD_MS = 100;
 

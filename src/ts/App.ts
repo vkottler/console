@@ -1,7 +1,7 @@
 import { ActionManager } from "./control/ActionManager";
 import { KeybindManager } from "./control/KeybindManager";
 
-export abstract class App {
+export class App {
   app: HTMLElement;
   width: number;
   height: number;
@@ -23,7 +23,9 @@ export abstract class App {
     this.pollDimensions();
   }
 
-  abstract dispatch(): void | undefined;
+  dispatch() {
+    return;
+  }
 
   dimensionsUpdate(width: number, height: number) {
     console.log(`new width:  ${width}`);
