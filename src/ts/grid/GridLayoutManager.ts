@@ -32,7 +32,7 @@ export type CursorUpdate = {
 
 const CURSOR_UPDATE = "cursorUpdate";
 
-type CursorUpdateHandler = (event: CustomEvent<CursorUpdate>) => void;
+export type CursorUpdateHandler = (event: CustomEvent<CursorUpdate>) => void;
 
 export class GridLayoutManager {
   container: HTMLElement;
