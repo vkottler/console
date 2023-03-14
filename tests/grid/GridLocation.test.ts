@@ -1,6 +1,6 @@
 import { Translation } from "../../src/ts/cartesian/Translation";
-import { GridDimensions } from "../../src/ts/grid/GridDimensions";
-import { GridLocation } from "../../src/ts/grid/GridLocation";
+import { GridDimensions } from "../../src/ts/grid/Dimensions";
+import { GridLocation } from "../../src/ts/grid/Location";
 
 describe("Testing the 'GridLocation' module.", () => {
   test("Basic interactions with grid locations.", () => {

@@ -1,6 +1,6 @@
-import { GridArea } from "./GridArea";
-import { GridDimensions } from "./GridDimensions";
-import { GridLocation } from "./GridLocation";
+import { GridArea } from "../Area";
+import { GridDimensions } from "../Dimensions";
+import { GridLocation } from "../Location";
 
 export const EMPTY = ".";
 

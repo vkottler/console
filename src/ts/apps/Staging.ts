@@ -1,6 +1,6 @@
-import { GridDimensions } from "../grid/GridDimensions";
-import { ElementArea } from "../grid/GridLayoutManager";
-import { GridLayoutManager } from "../grid/GridLayoutManager";
+import { GridDimensions } from "../grid/Dimensions";
+import { ElementArea } from "../grid/layout/Manager";
+import { GridLayoutManager } from "../grid/layout/Manager";
 import { Cursor } from "./Cursor";
 
 export function sampleGridUpdateHandler(event: CustomEvent<ElementArea>) {

@@ -4,7 +4,7 @@ import { App } from "../App";
 import {
   GridAreaUpdateHandler,
   GridLayoutManager,
-} from "../grid/GridLayoutManager";
+} from "../grid/layout/Manager";
 import { sampleGridUpdateHandler, sampleLayoutManager } from "./Staging";
 
 export abstract class BaseSampleApp extends App {

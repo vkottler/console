@@ -4,12 +4,12 @@ import {
   allTranslations,
   Translation,
   translationName,
-} from "../cartesian/Translation";
-import { ActionManager } from "../control/ActionManager";
-import { AreaUpdateHandler, GridArea } from "./GridArea";
-import { GridDimensions } from "./GridDimensions";
-import { GridLayout } from "./GridLayout";
-import { GridLocation } from "./GridLocation";
+} from "../../cartesian/Translation";
+import { ActionManager } from "../../control/ActionManager";
+import { AreaUpdateHandler, GridArea } from "../Area";
+import { GridDimensions } from "../Dimensions";
+import { GridLocation } from "../Location";
+import { GridLayout } from ".";
 
 const GRID_RESIZE = "gridResize";
 const ERROR_MESSAGE = "errorMessage";
