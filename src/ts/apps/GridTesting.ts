@@ -1,8 +1,8 @@
 import assert from "assert";
 
 import { eventDirection, translationName } from "../cartesian/Translation";
-import { ModKeyFlag } from "../control/Keybind";
-import { ActionKeybindMap } from "../control/KeybindManager";
+import { ModKeyFlag } from "../control/keybind";
+import { ActionKeybindMap } from "../control/keybind/Manager";
 import { BaseSampleApp } from "./BaseSampleApp";
 
 export class SampleApp extends BaseSampleApp {
