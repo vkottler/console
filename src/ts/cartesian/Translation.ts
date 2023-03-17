@@ -94,3 +94,26 @@ export function translate(
 
   return location;
 }
+
+export function* sideCorners(
+  direction: Translation
+): Generator<RectangleCorner> {
+  switch (direction) {
+    case Translation.up:
+      yield RectangleCorner.topLeft;
+      yield RectangleCorner.topRight;
+      break;
+    case Translation.down:
+      yield RectangleCorner.bottomLeft;
+      yield RectangleCorner.bottomRight;
+      break;
+    case Translation.left:
+      yield RectangleCorner.topLeft;
+      yield RectangleCorner.bottomLeft;
+      break;
+    case Translation.right:
+      yield RectangleCorner.topRight;
+      yield RectangleCorner.bottomRight;
+      break;
+  }
+}

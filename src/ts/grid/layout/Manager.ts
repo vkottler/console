@@ -97,6 +97,23 @@ export class GridLayoutManager extends GridLayoutManagerBase {
     return true;
   }
 
+  #registerMoveCursor(actions: ActionManager): boolean {
+    for (const direction of allTranslations()) {
+      const suffix = translationName(direction, true);
+
+      /* Move cursor handler. */
+      assert(
+        actions.register(
+          `moveCursor${suffix}`,
+          (() => {
+            return this.layout.moveCursor(direction);
+          }).bind(this)
+        )
+      );
+    }
+    return true;
+  }
+
   registerActions(
     actions: ActionManager,
     gridAreaUpdateHandler: GridAreaUpdateHandler
@@ -106,6 +123,7 @@ export class GridLayoutManager extends GridLayoutManagerBase {
     assert(this.#registerExpandCursorArea(actions));
     assert(this.#registerContractCursorArea(actions));
     assert(this.#registerExpandCreate(actions, gridAreaUpdateHandler));
+    assert(this.#registerMoveCursor(actions));
     return true;
   }
 }
