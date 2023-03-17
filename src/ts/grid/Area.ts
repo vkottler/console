@@ -8,9 +8,11 @@ import {
 import {
   isHorizontal,
   isVertical,
+  sideCorners,
   Translation,
 } from "../cartesian/Translation";
 import { GridDimensions } from "./Dimensions";
+import { GridLine } from "./Line";
 import { GridLocation } from "./Location";
 
 export const EMPTY = ".";
@@ -19,6 +21,10 @@ export const INIT_ID = -1;
 function areaName(areaId: number): string {
   assert(areaId >= 0);
   return "area-" + areaId.toString();
+}
+
+export function areaId(name: string): number {
+  return +name.substring(5);
 }
 
 export type AreaUpdateHandler = (area: GridArea) => void;
@@ -45,6 +51,19 @@ export class GridArea {
     this.dimensions = dimensions;
     this.handler = handler;
     this.areaId = areaId;
+  }
+
+  getSide(direction: Translation): GridLine {
+    const corners: RectangleCorner[] = [];
+
+    for (const corner of sideCorners(direction)) {
+      corners.push(corner);
+    }
+
+    return new GridLine(
+      this.cornerLocation(corners[0]),
+      this.cornerLocation(corners[1])
+    );
   }
 
   copy(): GridArea {

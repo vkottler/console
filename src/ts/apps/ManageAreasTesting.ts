@@ -10,6 +10,11 @@ export class SampleApp extends BaseSampleApp {
         expandAndCreateAreaDown: { key: "j" },
         expandAndCreateAreaLeft: { key: "h" },
         expandAndCreateAreaRight: { key: "l" },
+
+        moveCursorUp: { key: "ArrowUp" },
+        moveCursorDown: { key: "ArrowDown" },
+        moveCursorLeft: { key: "ArrowLeft" },
+        moveCursorRight: { key: "ArrowRight" },
       })
     );
   }
